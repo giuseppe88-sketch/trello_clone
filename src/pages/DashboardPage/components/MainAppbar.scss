@@ -1,0 +1,35 @@
+.main-bar {
+  padding: 2px;
+  margin: 0 auto;
+  width: 100%;
+  // backgroundColor: "#23282e",
+  background-color: #1d2125;
+  border-bottom: 0.1px solid hsla(211, 18%, 68%, 0.16);
+  .toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .toolbar-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  .toolbar-item {
+    display: flex;
+    gap: 4px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    padding: 7px;
+    transition: background-color 0.1s ease;
+    &:hover {
+      background-color: #5f6e8833;
+    }
+  }
+  p {
+    font-size: 14px;
+  }
+}

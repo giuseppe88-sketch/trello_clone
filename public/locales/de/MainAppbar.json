@@ -1,0 +1,12 @@
+{
+    "appbar": {
+      "workspaces": "Arbeitsbereiche",
+      "recent": "Zuletzt",
+      "starred": "Markiert",
+      "templates": "Vorlagen",
+      "create": "Erstellen"
+    },
+    "search": {
+      "placeholder": "Suche"
+    }
+  }

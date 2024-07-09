@@ -1,0 +1,12 @@
+{
+    "appbar": {
+      "workspaces": "Workspaces",
+      "recent": "Recent",
+      "starred": "Starred",
+      "templates": "Templates",
+      "create": "Create"
+    },
+    "search": {
+      "placeholder": "Search"
+    }
+  }
