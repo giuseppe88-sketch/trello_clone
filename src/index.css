@@ -6,11 +6,9 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
-body{
+body {
+  background-color: #1d2125 !important;
   /* background-color: #242424 !important; */
-  background-color: #ffffff48 !important;
-
+  /* background-color: #ffffff48 !important; */
 }
-

@@ -1,9 +1,22 @@
-import React, { createContext, useState } from "react";
-import { login, register } from "../services/api";
+import React, { createContext, useEffect, useState } from "react";
+import {
+  getCardsRequest,
+  getListRequest,
+  login,
+  register,
+  postCardRequest,
+} from "../services/api";
 
 interface AuthState {
   isAuthenticated: boolean;
   loginRequest: (username: string, password: string) => Promise<void>;
+  postCardRequest: (
+    title: string,
+    description: string,
+    listId: string,
+    YOUR_ACCESS_TOKEN: string,
+    position: number
+  ) => Promise<void>;
   registerRequest: (
     username: string,
     password: string,
@@ -11,14 +24,17 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   userToken: string;
+  dataCards: [];
 }
 
 const initialAuthState: AuthState = {
   isAuthenticated: false,
   loginRequest: async () => {},
   registerRequest: async () => {},
+  postCardRequest: async () => {},
   logout: () => {},
   userToken: "",
+  dataCards: [],
 };
 
 export const AuthContext = createContext(initialAuthState);
@@ -31,7 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userToken, setUserToken] = useState< string | null>(localStorage.getItem('token'));
+  const [userToken, setUserToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
+  const [data, setData] = useState<[]>([]);
+  const [dataCards, setDataCards] = useState<[]>([]);
 
   const loginRequest = async (username: string, password: string) => {
     return login(username, password)
@@ -73,10 +93,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(error);
       });
   };
+
+  const getList = async (userToken: string | null) => {
+    return getListRequest(userToken as string)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("Fetch List from User", response);
+          setData(response);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const logout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
   };
+
+  const getCards = async (userToken: string | null) => {
+    return getCardsRequest(userToken as string)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("Fetch Cards from User", response);
+          setDataCards(response);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const postCard = async (
+    title: string,
+    description: string,
+    userToken: string | null,
+    listId: string,
+    position: number
+  ) => {
+    return postCardRequest(
+      userToken as string,
+      title,
+      description,
+      listId,
+      position
+    )
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("Fetch Cards from User", response);
+          setDataCards(response);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    if (userToken) {
+      getList(userToken);
+      getCards(userToken);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -86,6 +172,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         userToken,
         registerRequest,
+        getList,
+        data,
+        setData, // for dashboard page to fetch data and update it.
+        dataCards,
+        postCard,
       }}
     >
       {children}

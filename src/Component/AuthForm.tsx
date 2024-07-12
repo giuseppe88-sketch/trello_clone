@@ -62,9 +62,9 @@ function AuthForm({
             alignItems: "center",
             padding: 1,
             borderRadius: "10px",
-            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
+            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.8)",
             height: type === "login" ? "680px" : "780px",
-            backgroundColor: type === "register" ? "#EFEFEF		" : null,
+            backgroundColor: type === "register" ? "rgba(211, 211, 226, 0.842)		" : "#EFEFEF",
           }}
         >
           <>
