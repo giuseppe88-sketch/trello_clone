@@ -1,41 +1,57 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   Box,
   Paper,
   Typography,
   Button,
-  Modal,
   TextField,
-  FormControl,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tooltip,
 } from "@mui/material";
 import "../DashboardPage.scss";
+import { Snackbar, Alert, Divider } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import NotesIcon from "@mui/icons-material/Notes";
+import EditIcon from "@mui/icons-material/Edit";
 
 export interface DataTableProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cards?: any[];
   handleAddCard?: () => void;
+  handleDeleteCard?: () => void;
   titleList: string;
   listId: string;
   setNewCardTitle: (title: string) => void;
   setNewCardDescription: (description: string) => void;
-  setOpen: (open: boolean) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean | null>>;
   open: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleSubmit: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  position: number;
-  setPosition: (position: number) => void;
-}
+  openAlert: boolean;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // handleSubmit: (listId:string) => void;
+  handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  position: number | null;
+  alert: string | null;
+  isError: boolean | null;
+  setPosition: (position: number | null) => void;
+  setOpenDelete: (open: boolean) => void;
+  openDelete: boolean;
+  setListId: (listId: string | null) => void;
+  setCardId: (cardId: string | null) => void;
+  onClickDeleteCard: (cardId: string | null, listId: string | null) => void;
+  handleCloseAlert?: (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => void;
+}
 
 function DataTable({
   titleList,
@@ -48,10 +64,39 @@ function DataTable({
   handleSubmit,
   setOpen,
   open,
+  setListId,
+  setCardId,
+  onClickDeleteCard,
+  openDelete,
+  setOpenDelete,
+  openAlert,
+  isError,
+  alert,
+  handleCloseAlert,
 }: DataTableProps) {
-  //   const [open, setOpen] = React.useState(false);
+  // const [openDelete, setOpenDelete] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+  };
+
+  const handleClick = () => {
+    setListId(listId);
+  };
+
+  const handleClickDeleteCard = (
+    cardId: string | null,
+    listId: string | null
+  ) => {
+    setListId(listId);
+    setCardId(cardId);
+    handleOpenDelete();
+  };
 
   return (
     <div>
@@ -131,22 +176,58 @@ function DataTable({
                     }}
                   >
                     <div
-                      className="icon-position"
                       style={{
                         display: "flex",
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                        paddingLeft: "8px",
+                        justifyContent: "space-between",
                       }}
                     >
-                      <Typography color="white" fontSize="12px">
-                        4
-                      </Typography>
+                      <div
+                        className="icon-position"
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          alignItems: "center",
+                          paddingLeft: "8px",
+                        }}
+                      >
+                        <Typography color="white" fontSize="12px">
+                          4
+                        </Typography>
+                      </div>
+                      <Tooltip title="Delete">
+                        <EditIcon
+                          onClick={() =>
+                            handleClickDeleteCard(card._id, listId)
+                          }
+                          sx={{
+                            fontSize: "13px",
+                            cursor: "pointer",
+                            "&:hover": {
+                              color: "grey", // Change color on hover
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                      <Dialog open={openDelete} onClose={handleCloseDelete}>
+                        <DialogTitle>
+                          {
+                            "Are you sure you want to delete this card from your list?"
+                          }
+                        </DialogTitle>
+                        <DialogContent>
+                          <Button
+                            onClick={onClickDeleteCard}
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                          >
+                            Delete
+                          </Button>
+                          <Button onClick={handleCloseDelete}>Come back</Button>
+                        </DialogContent>
+                      </Dialog>
                     </div>
 
-                    {/* <div>
-                      <Typography fontSize="18px">{card.title}</Typography>
-                    </div> */}
                     <div>
                       <Typography
                         sx={{
@@ -158,7 +239,7 @@ function DataTable({
                         {card.description}
                       </Typography>
                     </div>
-                    <NotesIcon fontSize="12px"></NotesIcon>
+                    <NotesIcon sx={{ fontSize: "12px" }}></NotesIcon>
                   </Box>
                 </Paper>
               </>
@@ -178,7 +259,7 @@ function DataTable({
                 cursor: "pointer",
                 textAlign: "start",
                 "&:hover": {
-                  backgroundColor: "grey", // Change color on hover
+                  backgroundColor: "grey",
                 },
               }}
               onClick={handleOpen}
@@ -193,15 +274,32 @@ function DataTable({
                 }}
               >
                 <AddIcon />
-                <Typography>Add Card</Typography>
+                <Button onClick={handleClick}>
+                  <Typography
+                    sx={{ textTransform: "capitalize", color: "white" }}
+                  >
+                    Add Card
+                  </Typography>
+                </Button>
                 <Dialog
                   open={open}
                   onClose={handleClose}
-                  // Remove BackdropProps and handle backdrop click in onClose
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                    color: "white",
+                  }}
+                  PaperProps={{
+                    sx: { backgroundColor: "#3e4b57", color: "white" },
+                  }}
                 >
-                  <DialogTitle>
+                  <DialogTitle
+                    sx={{ display: "flex", justifyContent: "flex-start" }}
+                    className="dialog-title"
+                  >
                     {`Adding new Task to `}
-                    {titleList}{listId}
+                    {titleList}
                   </DialogTitle>
                   <DialogContent>
                     <form onSubmit={handleSubmit}>
@@ -215,6 +313,28 @@ function DataTable({
                         onChange={(event: any) => {
                           setNewCardTitle(event.target.value);
                         }}
+                        InputProps={{
+                          sx: {
+                            color: "#fff", // Change text color
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#ccc", // Change border color
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#fff", // Change border color on hover
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "white", // Change border color when focused
+                            },
+                          },
+                        }}
+                        InputLabelProps={{
+                          sx: {
+                            color: "#ccc", // Change label color
+                            "&.Mui-focused": {
+                              color: "white", // Change label color when focused
+                            },
+                          },
+                        }}
                       />
                       <TextField
                         margin="dense"
@@ -224,6 +344,28 @@ function DataTable({
                         fullWidth
                         onChange={(event: any) => {
                           setNewCardDescription(event.target.value);
+                        }}
+                        InputProps={{
+                          sx: {
+                            color: "#fff", // Change text color
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color on hover
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color when focused
+                            },
+                          },
+                        }}
+                        InputLabelProps={{
+                          sx: {
+                            color: "#B6C2CF", // Change label color
+                            "&.Mui-focused": {
+                              color: "#B6C2CF", // Change label color when focused
+                            },
+                          },
                         }}
                       />
 
@@ -238,61 +380,40 @@ function DataTable({
                         }}
                         inputProps={{ min: 1, max: 5 }}
                         fullWidth
+                        InputProps={{
+                          sx: {
+                            color: "#B6C2CF", // Change text color
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color on hover
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#B6C2CF", // Change border color when focused
+                            },
+                          },
+                        }}
+                        InputLabelProps={{
+                          sx: {
+                            color: "#B6C2CF", // Change label color
+                            "&.Mui-focused": {
+                              color: "#B6C2CF", // Change label color when focused
+                            },
+                          },
+                        }}
                       />
                       <DialogActions>
-                        <Button onClick={handleClose} color="secondary">
+                        <button onClick={handleClose} className="cancel-button">
                           Cancel
-                        </Button>
-                        <Button type="submit" color="primary">
+                        </button>
+                        <button type="submit" className="submit-button">
                           Submit
-                        </Button>
+                        </button>
                       </DialogActions>
                     </form>
                   </DialogContent>
                 </Dialog>
-                {/* <Modal
-                  open={open}
-                  onClose={handleClose}
-                  aria-labelledby="modal-modal-title"
-                  aria-describedby="modal-modal-description"
-                  backdrop={{ onClick: handleClose }}
-
-                >
-                  <Box sx={style}>
-                    <Typography
-                      id="modal-modal-title"
-                      variant="h6"
-                      component="h2"
-                    >
-                      {titleList}
-                    </Typography>
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="title"
-                          label="Title"
-                          type="text"
-                          fullWidth
-                          onChange={(e) => setNewCardTitle(e.target.value)}
-                        />
-                        <TextField
-                          autoFocus
-                          margin="dense"
-                          id="description"
-                          label="Description"
-                          type="text"
-                          fullWidth
-                          onChange={(e) =>
-                            setNewCardDescription(e.target.value)
-                          }
-                        />
-                        <Button type="submit" variant="contained">
-                          SUBMIT
-                        </Button>
-                    </form>
-                  </Box>
-                </Modal> */}
               </Box>
               <Box></Box>
               <Box
@@ -307,6 +428,19 @@ function DataTable({
             </Button>
           </div>
         </Paper>
+        <Snackbar
+          open={openAlert}
+          autoHideDuration={6000}
+          onClose={handleCloseAlert}
+        >
+          <Alert
+            onClose={handleCloseAlert}
+            severity={isError ? "error" : "success"}
+            sx={{ width: "100%" }}
+          >
+            {alert}
+          </Alert>
+        </Snackbar>
       </Box>
     </div>
   );

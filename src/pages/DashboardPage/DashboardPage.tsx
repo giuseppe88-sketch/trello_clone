@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import { Box } from "@mui/material";
 import "./DashboardPage.scss";
-import { useNavigate } from "react-router-dom";
 
 import backgroundImage from "../../assets/backgroundImage.jpg";
 
@@ -18,51 +17,103 @@ const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
 export default function DashboardPage() {
   const {
     userToken,
-    isAuthenticated,
-    getList,
+
+    getCards,
     data,
-    setData,
     dataCards,
     postCard,
+    setListId,
+    listId,
+    setCardId,
+    cardId,
+    deleteCard,
   } = useContext(AuthContext);
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [position, setPosition] = useState<number>(null);
-  const [open, setOpen] = React.useState(false);
+  const [position, setPosition] = useState<number | null>(null);
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [openDelete, setOpenDelete] = React.useState<boolean>(false);
+  const [openAlert, setOpenAlert] = useState<boolean>(false); // State to control Snackbar
+  const [alert, setAlert] = useState<string | null>(null);
+  const [isError, setIsError] = useState<boolean | null>(null);
 
   // const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const handleSubmit =
+    (listId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      console.log(title, description, position, listId);
 
-  // const handleSubmit = (event: Event) => {
-  //   event.preventDefault();
-  //   console.log(title, description, position);
-  //   postCard(title, description, userToken, listId, position);
-  //   setDescription("");
-  //   setTitle("");
-  //   setPosition(null);
-  //   setOpen(false);
-  // };
+      postCard(title, description, listId, userToken, position)
+        .then((result: any) => {
+          console.log("result", result);
+          if (!result || result === undefined) {
+            setOpen(false);
+            setAlert("error occurred while submitting");
+            setIsError(true);
+            setOpenAlert(true);
+            return;
+          }
+          console.log("Card added successfully:", result);
+          setDescription("");
+          setTitle("");
+          setPosition(null);
+          setListId(null);
+          setIsError(false);
+          setAlert("Card added successfully");
+          setOpenAlert(true);
+        })
+        .then(() => {
+          getCards(userToken).then(() => {
+            console.log("Cards refreshed successfully");
+          });
+          setOpen(false);
+        })
 
-  const handleSubmit = (titleList: string) => (event: React.FormEvent) => {
-    event.preventDefault();
-    console.log(title, description, position, titleList);
+        .catch((error): any => {
+          console.error("Error adding card:", error);
+          // Handle error appropriately
+        });
+    };
 
-    // Assuming you have a way to determine currentListId dynamically
-    // const currentListId = titleList; // Use titleList as listId
+  const handleSubmitDelete =
+    (cardId: string | null, listId: string | null) =>
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      deleteCard(cardId, listId, userToken)
+        .then((result: any) => {
+          console.log("Card deleted successfully:", result);
+          setAlert("Card deleted successfully");
+          setOpenAlert(true);
+          setIsError(false);
+          setCardId(null);
+          setPosition(null);
+          setListId(null);
+        })
+        .then(() => {
+          getCards(userToken).then(() => console.log("Cardssssss"));
+          setOpenDelete(false);
+        })
 
-    // postCard(title, description, userToken, currentListId, position)
-    //   .then((result) => {
-    //     console.log("Card added successfully:", result);
-    //     setDescription("");
-    //     setTitle("");
-    //     setPosition(null);
-    //     setOpen(false);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error adding card:", error);
-    //     // Handle error appropriately
-    //   });
+        .catch((error: any): any => {
+          setAlert("error deleting card");
+          setOpenAlert(true);
+          setIsError(true);
+          console.error("Error deleting card:", error);
+          // Handle error appropriately
+        });
+    };
+
+  const handleCloseAlert = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenAlert(false); // Close the Snackbar
   };
+
   return (
     <>
       {userToken ? (
@@ -80,6 +131,7 @@ export default function DashboardPage() {
           <MainAppbar
             newCardContent={""}
             onSearchChange={function (
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               e: React.ChangeEvent<HTMLInputElement>
             ): void {
               throw new Error("Function not implemented.");
@@ -100,23 +152,32 @@ export default function DashboardPage() {
                   listOrder.indexOf(a.title) - listOrder.indexOf(b.title)
               )
               .map((list: any) => {
-                const cards = dataCards.filter(
+                const cards = dataCards?.filter(
                   (card: any) => card.listId === list._id
                 );
-
                 return (
                   <>
                     <DataTable
                       titleList={list.title}
                       cards={cards}
-                      listId={list.id}
-                      handleSubmit={handleSubmit(list.id)}
+                      listId={list._id}
+                      handleSubmit={handleSubmit(listId)}
                       setNewCardTitle={setTitle}
                       setNewCardDescription={setDescription}
                       position={position}
                       setPosition={setPosition}
                       open={open}
+                      openDelete={openDelete}
+                      setOpenDelete={setOpenDelete}
                       setOpen={setOpen}
+                      setListId={setListId}
+                      setCardId={setCardId}
+                      onClickDeleteCard={handleSubmitDelete(cardId, listId)}
+                      handleCloseAlert={handleCloseAlert}
+                      openAlert={openAlert}
+                      alert={alert}
+                      setAlert={setAlert}
+                      isError={isError}
                     />
                   </>
                 );

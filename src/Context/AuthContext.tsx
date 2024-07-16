@@ -5,36 +5,105 @@ import {
   login,
   register,
   postCardRequest,
+  deleteCardRequest,
 } from "../services/api";
+
+// interface AuthState {
+//   isAuthenticated: boolean;
+//   loginRequest: (username: string, password: string) => Promise<void>;
+//   postCardRequest: (
+//     title: string,
+//     description: string,
+//     listId: string,
+//     YOUR_ACCESS_TOKEN: string,
+//     position: number
+//   ) => Promise<void>;
+//   registerRequest: (
+//     username: string,
+//     password: string,
+//     email: string
+//   ) => Promise<void>;
+//   logout: () => void;
+//   userToken: string | null;
+//   dataCards: [];
+//   getList: (userToken: string) => Promise<void>;
+//   getCards: (userToken: string) => Promise<void>;
+//   setListId: (listId: string | null) => void;
+//   setCardId: React.Dispatch<React.SetStateAction<string>>;
+
+//   // onClickDeleteCard: () => void;
+//   // onClickCloseDelete: () => void;
+//   // openDelete: boolean;
+//   // setOpenDelete: () => void;
+//   postCard: (
+//     title: string,
+//     description: string,
+//     listId: string,
+//     YOUR_ACCESS_TOKEN: string | null,
+//     position: number
+//   ) => Promise<void>;
+//   data: [];
+//   setData: (data: []) => void;
+//   listId: string | null;
+//   cardId: string | null;
+//   deleteCard: (
+//     cardId: string | null,
+//     listId: string | null,
+//     userToken: string
+//   ) => Promise<void>;
+// }
 
 interface AuthState {
   isAuthenticated: boolean;
   loginRequest: (username: string, password: string) => Promise<void>;
-  postCardRequest: (
-    title: string,
-    description: string,
-    listId: string,
-    YOUR_ACCESS_TOKEN: string,
-    position: number
-  ) => Promise<void>;
+
   registerRequest: (
     username: string,
     password: string,
     email: string
   ) => Promise<void>;
   logout: () => void;
-  userToken: string;
+  userToken: string | null;
   dataCards: [];
+  getList: (userToken: string | null) => Promise<void>;
+  getCards: (userToken: string | null) => Promise<void>;
+  setListId: (listId: string | null) => void;
+  setCardId: React.Dispatch<React.SetStateAction<string | null>>;
+  postCard: (
+    title: string | null,
+    description: string | null,
+    listId: string | null,
+    userToken: string | null,
+    position: number | null
+  ) => Promise<void>;
+  data: [];
+  setData: (data: []) => void;
+  listId: string | null;
+  cardId: string | null;
+  deleteCard: (
+    cardId: string | null,
+    listId: string | null,
+    userToken: string | null
+  ) => Promise<void>;
 }
 
 const initialAuthState: AuthState = {
   isAuthenticated: false,
   loginRequest: async () => {},
   registerRequest: async () => {},
-  postCardRequest: async () => {},
+  deleteCard: async () => {},
+  getList: async () => {},
+  getCards: async () => {},
   logout: () => {},
-  userToken: "",
+  userToken: null,
   dataCards: [],
+  setListId: async () => {},
+  setCardId: async () => {},
+  postCard: async () => {},
+  data: [],
+  setData: async () => {},
+  listId: null,
+  cardId: null,
 };
 
 export const AuthContext = createContext(initialAuthState);
@@ -52,6 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [data, setData] = useState<[]>([]);
   const [dataCards, setDataCards] = useState<[]>([]);
+  const [listId, setListId] = useState<string | null>(null); // New state for listId
+  const [cardId, setCardId] = useState<string>(""); // New state for listId
 
   const loginRequest = async (username: string, password: string) => {
     return login(username, password)
@@ -94,8 +165,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getList = async (userToken: string | null) => {
-    return getListRequest(userToken as string)
+    return getListRequest(userToken)
       .then((response) => {
         if (!response) {
           console.error(response);
@@ -114,8 +186,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsAuthenticated(false);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getCards = async (userToken: string | null) => {
-    return getCardsRequest(userToken as string)
+    return getCardsRequest(userToken)
       .then((response) => {
         if (!response) {
           console.error(response);
@@ -129,27 +202,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(error);
       });
   };
+
   const postCard = async (
     title: string,
     description: string,
-    userToken: string | null,
     listId: string,
-    position: number
+    userToken: string | null,
+    position: number | null
   ) => {
-    return postCardRequest(
-      userToken as string,
-      title,
-      description,
-      listId,
-      position
-    )
+    return postCardRequest(title, description, listId, userToken, position)
       .then((response) => {
         if (!response) {
           console.error(response);
           return response;
         } else {
-          console.log("Fetch Cards from User", response);
-          setDataCards(response);
+          console.log("post Cards from User", response);
+          return response;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const deleteCard = async (
+    cardId: string | null,
+    listId: string | null,
+    userToken: string | null
+  ) => {
+    return deleteCardRequest(cardId, listId, userToken)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("Card Delete from user", response);
         }
       })
       .catch((error) => {
@@ -159,10 +245,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (userToken) {
-      getList(userToken);
       getCards(userToken);
+      getList(userToken);
     }
-  }, []);
+  }, [userToken]);
 
   return (
     <AuthContext.Provider
@@ -172,11 +258,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         userToken,
         registerRequest,
+        getCards,
         getList,
         data,
         setData, // for dashboard page to fetch data and update it.
         dataCards,
         postCard,
+        setListId, // for dashboard page to set listId.
+        listId,
+        cardId,
+        setCardId,
+        deleteCard,
       }}
     >
       {children}

@@ -64,7 +64,7 @@ export const register = async (
       throw error;
     });
 };
-export const getListRequest = async (YOUR_ACCESS_TOKEN: string) => {
+export const getListRequest = async (YOUR_ACCESS_TOKEN: string | null) => {
   const requestOptions = {
     method: "GET",
     headers: {
@@ -92,7 +92,7 @@ export const getListRequest = async (YOUR_ACCESS_TOKEN: string) => {
       throw error;
     });
 };
-export const getCardsRequest = async (YOUR_ACCESS_TOKEN: string) => {
+export const getCardsRequest = async (YOUR_ACCESS_TOKEN: string | null) => {
   const requestOptions = {
     method: "GET",
     headers: {
@@ -122,16 +122,17 @@ export const getCardsRequest = async (YOUR_ACCESS_TOKEN: string) => {
 };
 
 export const postCardRequest = async (
-  title: string,
-  description: string,
-  listId: string,
-  YOUR_ACCESS_TOKEN: string,
-  position: number
+  title: string | null,
+  description: string | null,
+  listId: string | null,
+  YOUR_ACCESS_TOKEN: string | null,
+  position: number | null
 ) => {
   const requestOptions = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${YOUR_ACCESS_TOKEN}`,
     },
     body: JSON.stringify({
       title,
@@ -143,6 +144,44 @@ export const postCardRequest = async (
     // credentials: "include" , // Include credentials (cookies, etc.)
   };
   const url = `https://trello-clone-backend-liard.vercel.app/api/listsCards/${listId}/card/`;
+
+  const request = new Request(url, requestOptions);
+
+  return fetch(request)
+    .then(async (response) => {
+      if (!response.ok) {
+        const error = await response.json();
+        return error;
+      }
+      return response.json();
+    })
+    .then((result) => {
+      return result;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
+
+export const deleteCardRequest = async (
+  cardId: string | null,
+  listId: string | null,
+  YOUR_ACCESS_TOKEN: string | null
+) => {
+  const requestOptions = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${YOUR_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      cardId,
+      listId,
+      YOUR_ACCESS_TOKEN,
+    }),
+    // credentials: "include" , // Include credentials (cookies, etc.)
+  };
+  const url = `https://trello-clone-backend-liard.vercel.app/api/listsCards/${listId}/card/${cardId}`;
 
   const request = new Request(url, requestOptions);
 
