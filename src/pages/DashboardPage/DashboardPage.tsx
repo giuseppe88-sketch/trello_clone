@@ -27,12 +27,15 @@ export default function DashboardPage() {
     setCardId,
     cardId,
     deleteCard,
+    putCard,
   } = useContext(AuthContext);
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [position, setPosition] = useState<number | null>(null);
+
   const [open, setOpen] = React.useState<boolean>(false);
+  const [openModify, setOpenModify] = React.useState<boolean>(false);
   const [openDelete, setOpenDelete] = React.useState<boolean>(false);
   const [openAlert, setOpenAlert] = useState<boolean>(false); // State to control Snackbar
   const [alert, setAlert] = useState<string | null>(null);
@@ -57,7 +60,6 @@ export default function DashboardPage() {
           console.log("Card added successfully:", result);
           setDescription("");
           setTitle("");
-          setPosition(null);
           setListId(null);
           setIsError(false);
           setAlert("Card added successfully");
@@ -68,6 +70,41 @@ export default function DashboardPage() {
             console.log("Cards refreshed successfully");
           });
           setOpen(false);
+        })
+
+        .catch((error): any => {
+          console.error("Error adding card:", error);
+          // Handle error appropriately
+        });
+    };
+  const handleSubmitModify =
+    (cardId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      console.log(title, description, position, listId);
+
+      putCard(cardId, userToken, title, description, position)
+        .then((result: any) => {
+          console.log("result", result);
+          if (!result || result === undefined) {
+            setOpenModify(false);
+            setAlert("error occurred while submitting");
+            setIsError(true);
+            setOpenAlert(true);
+            return;
+          }
+          console.log("Card modified successfully:", result);
+          // setDescription("");
+          // setTitle("");
+          setCardId(null);
+          // setIsError(false);
+          // setAlert("Card modified successfully");
+          // setOpenAlert(true);
+        })
+        .then(() => {
+          getCards(userToken).then(() => {
+            console.log("Cards refreshed successfully");
+          });
+          setOpenModify(false);
         })
 
         .catch((error): any => {
@@ -87,7 +124,6 @@ export default function DashboardPage() {
           setOpenAlert(true);
           setIsError(false);
           setCardId(null);
-          setPosition(null);
           setListId(null);
         })
         .then(() => {
@@ -113,6 +149,38 @@ export default function DashboardPage() {
     }
     setOpenAlert(false); // Close the Snackbar
   };
+
+  //TODO: REFACTOR PROPERTIES 
+  //   Group state-related props
+  // const stateProps = {
+  //   setCardTitle: setTitle,
+  //   cardTitle: title,
+  //   setCardDescription: setDescription,
+  //   cardDescription: description,
+  //   position,
+  //   setPosition,
+  //   open,
+  //   openDelete,
+  //   setOpenDelete,
+  //   openModify,
+  //   setOpenModify,
+  //   setOpen,
+  //   setListId,
+  //   setCardId,
+  //   openAlert,
+  //   alert,
+  //   setAlert,
+  //   isError,
+  // };
+
+  // Group handler props
+  // const handlerProps = {
+  //   handleSubmit,
+  //   handleSubmitModify,
+  //   onClickDeleteCard: handleSubmitDelete,
+  //   handleCloseAlert,
+  // };
+
 
   return (
     <>
@@ -162,13 +230,18 @@ export default function DashboardPage() {
                       cards={cards}
                       listId={list._id}
                       handleSubmit={handleSubmit(listId)}
-                      setNewCardTitle={setTitle}
-                      setNewCardDescription={setDescription}
+                      handleSubmitModify={handleSubmitModify(cardId)}
+                      setCardTitle={setTitle}
+                      cardTitle={title}
+                      setCardDescription={setDescription}
+                      cardDescription={description}
                       position={position}
                       setPosition={setPosition}
                       open={open}
                       openDelete={openDelete}
                       setOpenDelete={setOpenDelete}
+                      openModify={openModify}
+                      setOpenModify={setOpenModify}
                       setOpen={setOpen}
                       setListId={setListId}
                       setCardId={setCardId}

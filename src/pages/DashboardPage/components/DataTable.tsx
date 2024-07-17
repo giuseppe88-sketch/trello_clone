@@ -10,43 +10,47 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Tooltip,
 } from "@mui/material";
 import "../DashboardPage.scss";
-import { Snackbar, Alert, Divider } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import NotesIcon from "@mui/icons-material/Notes";
-import EditIcon from "@mui/icons-material/Edit";
+import Cards from "./Cards";
 
 export interface DataTableProps {
+  cards: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cards?: any[];
   handleAddCard?: () => void;
   handleDeleteCard?: () => void;
   titleList: string;
+  cardTitle: string;
+  cardDescription: string;
   listId: string;
-  setNewCardTitle: (title: string) => void;
-  setNewCardDescription: (description: string) => void;
-  setOpen: React.Dispatch<React.SetStateAction<boolean | null>>;
+  setCardTitle: (title: string) => void;
+  setCardDescription: (description: string) => void;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenModify: React.Dispatch<React.SetStateAction<boolean>>;
   open: boolean;
+  openModify: boolean;
   openAlert: boolean;
+  position: number | null;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // handleSubmit: (listId:string) => void;
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  handleSubmitModify: React.FormEventHandler<HTMLFormElement>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  position: number | null;
   alert: string | null;
   isError: boolean | null;
-  setPosition: (position: number | null) => void;
+  setPosition: (position: number) => void;
   setOpenDelete: (open: boolean) => void;
   openDelete: boolean;
   setListId: (listId: string | null) => void;
   setCardId: (cardId: string | null) => void;
-  onClickDeleteCard: (cardId: string | null, listId: string | null) => void;
+  setAlert: React.Dispatch<React.SetStateAction<string | null>>;
+  onClickDeleteCard: any;
   handleCloseAlert?: (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -54,14 +58,17 @@ export interface DataTableProps {
 }
 
 function DataTable({
+  cards,
   titleList,
   listId,
-  cards,
-  setNewCardTitle,
-  setNewCardDescription,
+  setCardTitle,
+  cardTitle,
+  setCardDescription,
+  cardDescription,
   position,
   setPosition,
   handleSubmit,
+  handleSubmitModify,
   setOpen,
   open,
   setListId,
@@ -69,6 +76,8 @@ function DataTable({
   onClickDeleteCard,
   openDelete,
   setOpenDelete,
+  openModify,
+  setOpenModify,
   openAlert,
   isError,
   alert,
@@ -77,25 +86,8 @@ function DataTable({
   // const [openDelete, setOpenDelete] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-  };
-  const handleOpenDelete = () => {
-    setOpenDelete(true);
-  };
-
   const handleClick = () => {
     setListId(listId);
-  };
-
-  const handleClickDeleteCard = (
-    cardId: string | null,
-    listId: string | null
-  ) => {
-    setListId(listId);
-    setCardId(cardId);
-    handleOpenDelete();
   };
 
   return (
@@ -154,96 +146,25 @@ function DataTable({
             className="custom-scrollbar"
             // ref={scrollContainerRef}
           >
-            {cards?.map((card: any) => (
-              <>
-                <Paper
-                  key={card.id}
-                  elevation={1}
-                  sx={{
-                    padding: "10px",
-                    margin: "8px 2px 8px 5px",
-                    color: "#B6C2CF",
-                    backgroundColor: "#22272bf5",
-                    borderRadius: "10px",
-                    boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "18px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div
-                        className="icon-position"
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                          paddingLeft: "8px",
-                        }}
-                      >
-                        <Typography color="white" fontSize="12px">
-                          4
-                        </Typography>
-                      </div>
-                      <Tooltip title="Delete">
-                        <EditIcon
-                          onClick={() =>
-                            handleClickDeleteCard(card._id, listId)
-                          }
-                          sx={{
-                            fontSize: "13px",
-                            cursor: "pointer",
-                            "&:hover": {
-                              color: "grey", // Change color on hover
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                      <Dialog open={openDelete} onClose={handleCloseDelete}>
-                        <DialogTitle>
-                          {
-                            "Are you sure you want to delete this card from your list?"
-                          }
-                        </DialogTitle>
-                        <DialogContent>
-                          <Button
-                            onClick={onClickDeleteCard}
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                          >
-                            Delete
-                          </Button>
-                          <Button onClick={handleCloseDelete}>Come back</Button>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-
-                    <div>
-                      <Typography
-                        sx={{
-                          fontSize: "14px",
-                          letterSpacing: "0.5px",
-                          lineHeight: "20px",
-                        }}
-                      >
-                        {card.description}
-                      </Typography>
-                    </div>
-                    <NotesIcon sx={{ fontSize: "12px" }}></NotesIcon>
-                  </Box>
-                </Paper>
-              </>
-            ))}
+            <Cards
+              cards={cards}
+              listId={listId}
+              setListId={setListId}
+              setCardId={setCardId}
+              setOpenDelete={setOpenDelete}
+              openDelete={openDelete}
+              onClickDeleteCard={onClickDeleteCard}
+              openModify={openModify}
+              titleList={titleList}
+              handleSubmitModify={handleSubmitModify}
+              cardTitle={cardTitle}
+              setCardTitle={setCardTitle}
+              cardDescription={cardDescription}
+              setCardDescription={setCardDescription}
+              setPosition={setPosition}
+              position={position}
+              setOpenModify={setOpenModify}
+            />
           </div>
           <div>
             <Button
@@ -311,7 +232,7 @@ function DataTable({
                         type="text"
                         fullWidth
                         onChange={(event: any) => {
-                          setNewCardTitle(event.target.value);
+                          setCardTitle(event.target.value);
                         }}
                         InputProps={{
                           sx: {
@@ -343,7 +264,7 @@ function DataTable({
                         type="text"
                         fullWidth
                         onChange={(event: any) => {
-                          setNewCardDescription(event.target.value);
+                          setCardDescription(event.target.value);
                         }}
                         InputProps={{
                           sx: {
@@ -404,7 +325,11 @@ function DataTable({
                         }}
                       />
                       <DialogActions>
-                        <button onClick={handleClose} className="cancel-button">
+                        <button
+                          onClick={() => setOpen(false)}
+                          className="cancel-button"
+                          // type="button" TODO: ADD THIS
+                        >
                           Cancel
                         </button>
                         <button type="submit" className="submit-button">

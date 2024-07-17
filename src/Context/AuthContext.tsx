@@ -6,6 +6,7 @@ import {
   register,
   postCardRequest,
   deleteCardRequest,
+  putCardRequest,
 } from "../services/api";
 
 // interface AuthState {
@@ -85,6 +86,13 @@ interface AuthState {
     listId: string | null,
     userToken: string | null
   ) => Promise<void>;
+  putCard: (
+    cardId: string | null,
+    userToken: string | null,
+    title: string | null,
+    description: string | null,
+    position: number | null
+  ) => Promise<void>;
 }
 
 const initialAuthState: AuthState = {
@@ -100,6 +108,7 @@ const initialAuthState: AuthState = {
   setListId: async () => {},
   setCardId: async () => {},
   postCard: async () => {},
+  putCard: async () => {},
   data: [],
   setData: async () => {},
   listId: null,
@@ -224,6 +233,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(error);
       });
   };
+  const putCard = async (
+    cardId: string | null,
+    userToken: string | null,
+    title: string | null,
+    description: string | null,
+    position: number | null
+  ) => {
+    return putCardRequest(cardId, userToken, title, description, position)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("put Cards from User", response);
+          return response;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const deleteCard = async (
     cardId: string | null,
     listId: string | null,
@@ -269,6 +299,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         cardId,
         setCardId,
         deleteCard,
+        putCard,
       }}
     >
       {children}

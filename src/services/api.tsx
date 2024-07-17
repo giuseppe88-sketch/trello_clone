@@ -162,6 +162,46 @@ export const postCardRequest = async (
       console.error("Error:", error);
     });
 };
+export const putCardRequest = async (
+  cardId: string | null,
+  YOUR_ACCESS_TOKEN: string | null,
+  title: string | null,
+  description: string | null,
+  position: number | null
+) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${YOUR_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      YOUR_ACCESS_TOKEN,
+      title,
+      description,
+      position,
+    }),
+    // credentials: "include" , // Include credentials (cookies, etc.)
+  };
+  const url = `https://trello-clone-backend-liard.vercel.app/api/cards/${cardId}`;
+
+  const request = new Request(url, requestOptions);
+
+  return fetch(request)
+    .then(async (response) => {
+      if (!response.ok) {
+        const error = await response.json();
+        return error;
+      }
+      return response.json();
+    })
+    .then((result) => {
+      return result;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
 
 export const deleteCardRequest = async (
   cardId: string | null,
