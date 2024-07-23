@@ -4,56 +4,56 @@ import {
   Box,
   Paper,
   Typography,
-  Button,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Tooltip,
 } from "@mui/material";
 
 import NotesIcon from "@mui/icons-material/Notes";
 import EditIcon from "@mui/icons-material/Edit";
+import DialogComp from "./DialogComp";
 
 export interface CardsProps {
-  cards: any[] | undefined;
+  card: any;
+  id: any;
   listId: string;
-  setListId: (listId: string | null) => void;
-  setCardId: (cardId: string | null) => void;
-  setOpenDelete: (open: boolean) => void;
-  openDelete: boolean;
-  onClickDeleteCard: any;
-  openModify: boolean;
-  titleList: string;
-  handleSubmitModify: React.FormEventHandler<HTMLFormElement>;
-  cardTitle: string;
-  setCardTitle: (title: string) => void;
-  cardDescription: string;
-  setCardDescription: (description: string) => void;
-  setPosition: (position: number) => void;
-  position: number | null;
-  setOpenModify: React.Dispatch<React.SetStateAction<boolean>>;
+  listProps: {
+    setListId: React.Dispatch<React.SetStateAction<string | null>>;
+    listId: string | null;
+  };
+  cardProps: {
+    setCardTitle: React.Dispatch<React.SetStateAction<string>>;
+    cardTitle: string;
+    setCardDescription: React.Dispatch<React.SetStateAction<string>>;
+    cardDescription: string;
+    setCardId: React.Dispatch<React.SetStateAction<string | null>>;
+    position: number | null;
+    setPosition: React.Dispatch<React.SetStateAction<number | null>>;
+  };
+  modalProps: {
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    openDelete: boolean;
+    setOpenDelete: React.Dispatch<React.SetStateAction<boolean>>;
+    openModify: boolean;
+    setOpenModify: React.Dispatch<React.SetStateAction<boolean>>;
+  };
+  handlers: {
+    handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+    handleSubmitModify: (event: React.FormEvent<HTMLFormElement>) => void;
+    onClickDeleteCard: (event:any) => void;
+  };
 }
 
 function Cards({
-  cards,
+  card,
+  id,
   listId,
-  setListId,
-  setCardId,
-  setOpenDelete,
-  openDelete,
-  onClickDeleteCard,
-  openModify,
-  titleList,
-  handleSubmitModify,
-  cardTitle,
-  setCardTitle,
-  cardDescription,
-  setCardDescription,
-  position,
-  setPosition,
-  setOpenModify,
+  listProps,
+  cardProps,
+  modalProps,
+  handlers,
 }: CardsProps) {
   const backgroundColor: { [key: number]: string } = {
     1: "#206A83",
@@ -64,275 +64,158 @@ function Cards({
   };
 
   const handleCloseDelete = () => {
-    setOpenDelete(false);
+    modalProps.setOpenDelete(false);
   };
   const handleOpenDelete = () => {
-    setOpenDelete(true);
-  };
-  const handleOpenModify = () => {
-    setOpenModify(true);
+    modalProps.setOpenDelete(true);
   };
 
   const handleCloseModify = () => {
-    setOpenModify(false);
+    modalProps.setOpenModify(false);
   };
+  const handleOpen = () => modalProps.setOpenModify(true);
+  // const handleClose = () => setOpenModify(false);
 
   const handleClickDeleteCard = (
     cardId: string | null,
     listId: string | null
   ) => {
-    setListId(listId);
-    setCardId(cardId);
+    listProps.setListId(listId);
+    cardProps.setCardId(cardId);
     handleOpenDelete();
   };
   const handleClickModifyCard = (cardId: string | null) => {
-    setCardId(cardId);
-    handleOpenModify();
+    cardProps.setCardId(cardId);
+    handleOpen();
+    modalProps.setOpenModify(true);
+  };
+  const stateProps = {
+    // listTitle,
+    cardTitle: cardProps.cardTitle,
+    setCardTitle: cardProps.setCardTitle,
+    description: cardProps.cardDescription,
+    setDescription: cardProps.setCardDescription,
+    position: cardProps.position,
+    setPosition: cardProps.setPosition as React.Dispatch<
+    React.SetStateAction<number>
+  >,
+    open: modalProps.openModify,
+    setOpen: modalProps.setOpenModify,
   };
 
+  // const [openDelete, setOpenDelete] = React.useState(false);
+  const handlerProps = {
+    handleSubmit: handlers.handleSubmitModify,
+    handleClose: handleCloseModify,
+  };
+
+  console.log("From card", cardProps.cardDescription);
+
   return (
-    <>
-      {cards?.map((card: any) => (
-        <Box key={card.id}>
-          <Paper
-            id={card.id}
-            key={card.id}
-            elevation={1}
+    <div>
+      <Box key={card.id} id={id}>
+        <Paper
+          id={card.id}
+          elevation={1}
+          sx={{
+            padding: "10px",
+            margin: "8px 2px 8px 5px",
+            color: "#B6C2CF",
+            backgroundColor: "#22272bf5",
+            borderRadius: "10px",
+            boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Box
             sx={{
-              padding: "10px",
-              margin: "8px 2px 8px 5px",
-              color: "#B6C2CF",
-              backgroundColor: "#22272bf5",
-              borderRadius: "10px",
-              boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
             }}
           >
-            <Box
-              sx={{
+            <div
+              style={{
                 display: "flex",
-                flexDirection: "column",
-                gap: "18px",
+                justifyContent: "space-between",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Tooltip title={`position ${card.position}`}>
-                  <Box
-                    className="icon-position"
-                    sx={{
-                      backgroundColor: backgroundColor[card.position],
-                    }}
-                  >
-                    <Typography color="white" fontSize="12px">
-                      {card.position}
-                    </Typography>
-                  </Box>
-                </Tooltip>
-                <Tooltip title={"Delete"}>
-                  <EditIcon
-                    onClick={() => handleClickDeleteCard(card._id, listId)}
-                    sx={{
-                      fontSize: "13px",
-                      cursor: "pointer",
-                      "&:hover": {
-                        color: "grey",
-                      },
-                    }}
-                  />
-                </Tooltip>
-                <Dialog open={openDelete} onClose={handleCloseDelete}>
-                  <DialogTitle>
-                    {
-                      "Are you sure you want to delete this card from your list?"
-                    }
-                  </DialogTitle>
-                  <DialogContent>
-                    <button
-                      onClick={onClickDeleteCard}
-                      // variant="contained"
-                      // color="primary"
-                      // size="small"
-                    >
-                      Delete
-                    </button>
-                    <Button onClick={handleCloseDelete}>Come back</Button>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div>
-                <Typography
-                  onClick={() => handleClickModifyCard(card._id)}
+              <Tooltip title={`position ${card.position}`}>
+                <Box
+                  className="icon-position"
                   sx={{
-                    fontSize: "14px",
-                    letterSpacing: "0.5px",
-                    lineHeight: "20px",
-                    cursor: "pointer",
+                    backgroundColor: backgroundColor[card.position],
                   }}
                 >
-                  {card.description}
-                </Typography>
-              </div>
-              <Tooltip title={"Edit"}>
-                <NotesIcon
-                  onClick={() => handleClickModifyCard(card._id)}
+                  <Typography color="white" fontSize="12px">
+                    {card.position}
+                  </Typography>
+                </Box>
+              </Tooltip>
+              <Tooltip title={"Delete"}>
+                <EditIcon
+                  onClick={() => {
+                    console.log(card._id, listId);
+                    handleClickDeleteCard(card._id, listId);
+                  }}
                   sx={{
-                    fontSize: "12px",
+                    fontSize: "13px",
                     cursor: "pointer",
                     "&:hover": {
                       color: "grey",
                     },
                   }}
-                ></NotesIcon>
+                />
               </Tooltip>
-              <Dialog
-                open={openModify}
-                onClose={handleCloseModify}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  width: "100%",
-                  color: "white",
-                }}
-                PaperProps={{
-                  sx: { backgroundColor: "#3e4b57", color: "white" },
-                }}
-              >
-                <DialogTitle
-                  sx={{ display: "flex", justifyContent: "flex-start" }}
-                  className="dialog-title"
-                >
-                  {`Modify Task to `}
-                  {titleList}
+              <Dialog open={modalProps.openDelete} onClose={handleCloseDelete}>
+                <DialogTitle>
+                  {"Are you sure you want to delete this card from your list?"}
                 </DialogTitle>
                 <DialogContent>
-                  <form onSubmit={handleSubmitModify}>
-                    <TextField
-                      autoFocus
-                      margin="dense"
-                      id="title"
-                      label={card.title}
-                      type="text"
-                      fullWidth
-                      value={cardTitle}
-                      onChange={(event: any) => {
-                        setCardTitle(event.target.value);
-                      }}
-                      InputProps={{
-                        sx: {
-                          color: "#fff", // Change text color
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#ccc", // Change border color
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#fff",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "white",
-                          },
-                        },
-                      }}
-                      InputLabelProps={{
-                        sx: {
-                          color: "#ccc",
-                          "&.Mui-focused": {
-                            color: "white",
-                          },
-                        },
-                      }}
-                    />
-                    <TextField
-                      margin="dense"
-                      id="description"
-                      label={card.description}
-                      type="text"
-                      fullWidth
-                      value={cardDescription}
-                      onChange={(event: any) => {
-                        setCardDescription(event.target.value);
-                      }}
-                      InputProps={{
-                        sx: {
-                          color: "#fff",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                        },
-                      }}
-                      InputLabelProps={{
-                        sx: {
-                          color: "#B6C2CF",
-                          "&.Mui-focused": {
-                            color: "#B6C2CF",
-                          },
-                        },
-                      }}
-                    />
-
-                    <TextField
-                      margin="dense"
-                      id="number"
-                      label={`${card.position}`}
-                      type="number"
-                      value={position}
-                      onChange={(e) => {
-                        setPosition(parseInt(e.target.value));
-                      }}
-                      inputProps={{ min: 1, max: 5 }}
-                      fullWidth
-                      InputProps={{
-                        sx: {
-                          color: "#B6C3CD",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#B6C2CF",
-                          },
-                        },
-                      }}
-                      InputLabelProps={{
-                        sx: {
-                          color: "#B6C2CF",
-                          "&.Mui-focused": {
-                            color: "#B6C2CF",
-                          },
-                        },
-                      }}
-                    />
-                    <DialogActions>
-                      <button
-                        type="button"
-                        onClick={handleCloseModify}
-                        className="cancel-button"
-                      >
-                        Cancel
-                      </button>
-                      <button type="submit" className="submit-button">
-                        Submit
-                      </button>
-                    </DialogActions>
-                  </form>
+                  <button
+                    type="button"
+                    className="cancel-button"
+                    onClick={handlers.onClickDeleteCard}
+                    style={{ backgroundColor: "red", marginRight: "10px" }}
+                  >
+                    Delete
+                  </button>
+                  <button onClick={handleCloseDelete} className="submit-button">
+                    Back
+                  </button>
                 </DialogContent>
               </Dialog>
-            </Box>
-          </Paper>
-        </Box>
-      ))}
-    </>
+            </div>
+
+            <div>
+              <Typography
+                onClick={() => handleClickModifyCard(card._id)}
+                sx={{
+                  fontSize: "14px",
+                  letterSpacing: "0.5px",
+                  lineHeight: "20px",
+                  cursor: "pointer",
+                }}
+              >
+                {card.description}
+              </Typography>
+            </div>
+            <Tooltip title={"Edit"}>
+              <NotesIcon
+                onClick={() => handleClickModifyCard(card._id)}
+                sx={{
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    color: "grey",
+                  },
+                }}
+              ></NotesIcon>
+            </Tooltip>
+            <DialogComp stateProps={stateProps} handlers={handlerProps} />
+          </Box>
+        </Paper>
+      </Box>
+    </div>
   );
 }
 

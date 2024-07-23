@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
-import { Box } from "@mui/material";
 import "./DashboardPage.scss";
 
 import backgroundImage from "../../assets/backgroundImage.jpg";
@@ -32,7 +31,7 @@ export default function DashboardPage() {
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [position, setPosition] = useState<number | null>(null);
+  const [position, setPosition] = useState<number>(1);
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [openModify, setOpenModify] = React.useState<boolean>(false);
@@ -45,7 +44,6 @@ export default function DashboardPage() {
   const handleSubmit =
     (listId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      console.log(title, description, position, listId);
 
       postCard(title, description, listId, userToken, position)
         .then((result: any) => {
@@ -54,7 +52,8 @@ export default function DashboardPage() {
             setOpen(false);
             setAlert("error occurred while submitting");
             setIsError(true);
-            setOpenAlert(true);
+            setOpenAlert(true); // const [openDelete, setOpenDelete] = React.useState(false);
+
             return;
           }
           console.log("Card added successfully:", result);
@@ -80,7 +79,6 @@ export default function DashboardPage() {
   const handleSubmitModify =
     (cardId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      console.log(title, description, position, listId);
 
       putCard(cardId, userToken, title, description, position)
         .then((result: any) => {
@@ -95,21 +93,21 @@ export default function DashboardPage() {
           console.log("Card modified successfully:", result);
           // setDescription("");
           // setTitle("");
+          setOpenModify(false);
           setCardId(null);
           // setIsError(false);
-          // setAlert("Card modified successfully");
+          setAlert("Card modified successfully");
           // setOpenAlert(true);
         })
         .then(() => {
           getCards(userToken).then(() => {
             console.log("Cards refreshed successfully");
           });
-          setOpenModify(false);
+          setOpen(false);
         })
 
         .catch((error): any => {
           console.error("Error adding card:", error);
-          // Handle error appropriately
         });
     };
 
@@ -136,7 +134,6 @@ export default function DashboardPage() {
           setOpenAlert(true);
           setIsError(true);
           console.error("Error deleting card:", error);
-          // Handle error appropriately
         });
     };
 
@@ -150,37 +147,57 @@ export default function DashboardPage() {
     setOpenAlert(false); // Close the Snackbar
   };
 
-  //TODO: REFACTOR PROPERTIES 
-  //   Group state-related props
-  // const stateProps = {
-  //   setCardTitle: setTitle,
-  //   cardTitle: title,
-  //   setCardDescription: setDescription,
-  //   cardDescription: description,
-  //   position,
-  //   setPosition,
-  //   open,
-  //   openDelete,
-  //   setOpenDelete,
-  //   openModify,
-  //   setOpenModify,
-  //   setOpen,
-  //   setListId,
-  //   setCardId,
-  //   openAlert,
-  //   alert,
-  //   setAlert,
-  //   isError,
-  // };
+  const listProps = {
+    setListId: setListId,
+    listId: listId,
+  };
 
-  // Group handler props
-  // const handlerProps = {
-  //   handleSubmit,
-  //   handleSubmitModify,
-  //   onClickDeleteCard: handleSubmitDelete,
-  //   handleCloseAlert,
-  // };
+  const cardProps = {
+    setCardTitle: setTitle,
+    cardTitle: title,
+    setCardDescription: setDescription,
+    cardDescription: description,
+    setCardId: setCardId,
+    position: position,
+    setPosition: setPosition,
+  };
 
+  const modalProps = {
+    open: open,
+    setOpen: setOpen,
+    openDelete: openDelete,
+    setOpenDelete: setOpenDelete,
+    openModify: openModify,
+    setOpenModify: setOpenModify,
+  };
+
+  const alertProps = {
+    openAlert: openAlert,
+    handleCloseAlert: handleCloseAlert,
+    alert: alert,
+    setAlert: setAlert,
+    isError: isError,
+  };
+
+  const handlers = {
+    handleSubmit: handleSubmit(listId),
+    handleSubmitModify: handleSubmitModify(cardId),
+    onClickDeleteCard: handleSubmitDelete(cardId, listId),
+  };
+
+  const sortedData = React.useMemo(() => {
+    return data
+      ?.sort(
+        (a: any, b: any) =>
+          listOrder.indexOf(a.title) - listOrder.indexOf(b.title)
+      )
+      .map((list: any) => {
+        const cards = dataCards?.filter(
+          (card: any) => card.listId === list._id
+        );
+        return { ...list, cards };
+      });
+  }, [data, listOrder, dataCards]);
 
   return (
     <>
@@ -206,56 +223,17 @@ export default function DashboardPage() {
             }}
           />
           <Navbar />
-          <Box
-            display="flex"
-            flexDirection="row"
-            p={1}
-            justifyContent="flex-start"
-            gap={"10px"}
-            ml={"10px"}
-          >
-            {data
-              ?.sort(
-                (a: any, b: any) =>
-                  listOrder.indexOf(a.title) - listOrder.indexOf(b.title)
-              )
-              .map((list: any) => {
-                const cards = dataCards?.filter(
-                  (card: any) => card.listId === list._id
-                );
-                return (
-                  <>
-                    <DataTable
-                      titleList={list.title}
-                      cards={cards}
-                      listId={list._id}
-                      handleSubmit={handleSubmit(listId)}
-                      handleSubmitModify={handleSubmitModify(cardId)}
-                      setCardTitle={setTitle}
-                      cardTitle={title}
-                      setCardDescription={setDescription}
-                      cardDescription={description}
-                      position={position}
-                      setPosition={setPosition}
-                      open={open}
-                      openDelete={openDelete}
-                      setOpenDelete={setOpenDelete}
-                      openModify={openModify}
-                      setOpenModify={setOpenModify}
-                      setOpen={setOpen}
-                      setListId={setListId}
-                      setCardId={setCardId}
-                      onClickDeleteCard={handleSubmitDelete(cardId, listId)}
-                      handleCloseAlert={handleCloseAlert}
-                      openAlert={openAlert}
-                      alert={alert}
-                      setAlert={setAlert}
-                      isError={isError}
-                    />
-                  </>
-                );
-              })}
-          </Box>{" "}
+
+          <>
+            <DataTable
+              sortedData={sortedData}
+              listProps={listProps}
+              cardProps={cardProps}
+              modalProps={modalProps}
+              alertProps={alertProps}
+              handlers={handlers}
+            />
+          </>
         </div>
       ) : (
         "USER NOT AUTHENTICATED"

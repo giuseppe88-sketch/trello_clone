@@ -9,51 +9,6 @@ import {
   putCardRequest,
 } from "../services/api";
 
-// interface AuthState {
-//   isAuthenticated: boolean;
-//   loginRequest: (username: string, password: string) => Promise<void>;
-//   postCardRequest: (
-//     title: string,
-//     description: string,
-//     listId: string,
-//     YOUR_ACCESS_TOKEN: string,
-//     position: number
-//   ) => Promise<void>;
-//   registerRequest: (
-//     username: string,
-//     password: string,
-//     email: string
-//   ) => Promise<void>;
-//   logout: () => void;
-//   userToken: string | null;
-//   dataCards: [];
-//   getList: (userToken: string) => Promise<void>;
-//   getCards: (userToken: string) => Promise<void>;
-//   setListId: (listId: string | null) => void;
-//   setCardId: React.Dispatch<React.SetStateAction<string>>;
-
-//   // onClickDeleteCard: () => void;
-//   // onClickCloseDelete: () => void;
-//   // openDelete: boolean;
-//   // setOpenDelete: () => void;
-//   postCard: (
-//     title: string,
-//     description: string,
-//     listId: string,
-//     YOUR_ACCESS_TOKEN: string | null,
-//     position: number
-//   ) => Promise<void>;
-//   data: [];
-//   setData: (data: []) => void;
-//   listId: string | null;
-//   cardId: string | null;
-//   deleteCard: (
-//     cardId: string | null,
-//     listId: string | null,
-//     userToken: string
-//   ) => Promise<void>;
-// }
-
 interface AuthState {
   isAuthenticated: boolean;
   loginRequest: (username: string, password: string) => Promise<void>;
@@ -68,7 +23,7 @@ interface AuthState {
   dataCards: [];
   getList: (userToken: string | null) => Promise<void>;
   getCards: (userToken: string | null) => Promise<void>;
-  setListId: (listId: string | null) => void;
+  setListId:  React.Dispatch<React.SetStateAction<string | null>>;
   setCardId: React.Dispatch<React.SetStateAction<string | null>>;
   postCard: (
     title: string | null,
