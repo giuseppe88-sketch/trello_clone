@@ -19,6 +19,7 @@ export default function DashboardPage() {
 
     getCards,
     data,
+    setData,
     dataCards,
     postCard,
     setListId,
@@ -186,18 +187,24 @@ export default function DashboardPage() {
   };
 
   const sortedData = React.useMemo(() => {
-    return data
-      ?.sort(
-        (a: any, b: any) =>
-          listOrder.indexOf(a.title) - listOrder.indexOf(b.title)
-      )
-      .map((list: any) => {
-        const cards = dataCards?.filter(
-          (card: any) => card.listId === list._id
-        );
-        return { ...list, cards };
-      });
-  }, [data, listOrder, dataCards]);
+    return data.map((list: any) => {
+      // Create a mapping from cardId to index in the original list.cards array
+      const cardOrderMap = list.cards.reduce(
+        (acc: any, card: any, index: number) => {
+          acc[card["title"]] = index;
+          return acc;
+        },
+        {}
+      );
+      // Filter and sort the cards according to their UPDATED order in list.cards
+      const cards = dataCards
+        ?.filter((card: any) => card.listId === list._id)
+        .sort((a: any, b: any) => {
+          return cardOrderMap[a.title] - cardOrderMap[b.title];
+        });
+      return { ...list, cards };
+    });
+  }, [data, dataCards]);
 
   return (
     <>

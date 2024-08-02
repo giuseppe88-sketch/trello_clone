@@ -5,6 +5,7 @@ import {
   login,
   register,
   postCardRequest,
+  moveCardRequest,
   deleteCardRequest,
   putCardRequest,
 } from "../services/api";
@@ -23,7 +24,7 @@ interface AuthState {
   dataCards: [];
   getList: (userToken: string | null) => Promise<void>;
   getCards: (userToken: string | null) => Promise<void>;
-  setListId:  React.Dispatch<React.SetStateAction<string | null>>;
+  setListId: React.Dispatch<React.SetStateAction<string | null>>;
   setCardId: React.Dispatch<React.SetStateAction<string | null>>;
   postCard: (
     title: string | null,
@@ -209,6 +210,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(error);
       });
   };
+  const moveCard = async (
+    cardId: string | null,
+    userToken: string | null,
+    listId: string | null
+  ) => {
+    return moveCardRequest(cardId, userToken, listId)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("put Cards from User", response);
+          return response;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const deleteCard = async (
     cardId: string | null,
     listId: string | null,
@@ -228,13 +248,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
   };
 
+  const postList = async (userToken: string | null, title: string | null) => {
+    return moveCardRequest(userToken, title)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("put Cards from User", response);
+          return response;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
     if (userToken) {
       getCards(userToken);
       getList(userToken);
     }
   }, [userToken]);
-
   return (
     <AuthContext.Provider
       value={{
@@ -255,6 +290,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setCardId,
         deleteCard,
         putCard,
+        moveCard,
+        postList
       }}
     >
       {children}

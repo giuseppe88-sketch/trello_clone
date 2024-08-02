@@ -13,6 +13,14 @@ import {
 import NotesIcon from "@mui/icons-material/Notes";
 import EditIcon from "@mui/icons-material/Edit";
 import DialogComp from "./DialogComp";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export interface CardsProps {
   card: any;
@@ -42,7 +50,7 @@ export interface CardsProps {
   handlers: {
     handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     handleSubmitModify: (event: React.FormEvent<HTMLFormElement>) => void;
-    onClickDeleteCard: (event:any) => void;
+    onClickDeleteCard: (event: any) => void;
   };
 }
 
@@ -97,8 +105,8 @@ function Cards({
     setDescription: cardProps.setCardDescription,
     position: cardProps.position,
     setPosition: cardProps.setPosition as React.Dispatch<
-    React.SetStateAction<number>
-  >,
+      React.SetStateAction<number>
+    >,
     open: modalProps.openModify,
     setOpen: modalProps.setOpenModify,
   };
@@ -109,112 +117,153 @@ function Cards({
     handleClose: handleCloseModify,
   };
 
-  console.log("From card", cardProps.cardDescription);
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: card._id,
+    data: {
+      type: "Card",
+      card,
+    },
+  });
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  };
+
+  if (isDragging) {
+    return (
+      <div ref={setNodeRef} style={style}>
+        <Paper
+          elevation={3}
+          sx={{
+            padding: "10px",
+            color: "#B6C2CF",
+            margin: "10px",
+            backgroundColor: "#22272af1",
+            opacity:.75,
+            borderRadius: "2px",
+            boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
+            height:"20px"
+          }}
+        ></Paper>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <Box key={card.id} id={id}>
-        <Paper
-          id={card.id}
-          elevation={1}
-          sx={{
-            padding: "10px",
-            margin: "8px 2px 8px 5px",
-            color: "#B6C2CF",
-            backgroundColor: "#22272bf5",
-            borderRadius: "10px",
-            boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box
+      <div ref={setNodeRef} style={style}>
+        <Box key={card._id} id={id}>
+          <Paper
+            {...attributes}
+            {...listeners}
+            id={card._id}
+            elevation={1}
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
+              padding: "10px",
+              margin: "8px 2px 8px 5px",
+              color: "#B6C2CF",
+              backgroundColor: "#22272bf5",
+              borderRadius: "10px",
+              boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <div
-              style={{
+            <Box
+              sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                flexDirection: "column",
+                gap: "18px",
               }}
             >
-              <Tooltip title={`position ${card.position}`}>
-                <Box
-                  className="icon-position"
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Tooltip title={`position ${card.position}`}>
+                  <Box
+                    className="icon-position"
+                    sx={{
+                      backgroundColor: backgroundColor[card.position],
+                    }}
+                  >
+                    <Typography color="white" fontSize="12px">
+                      {card.position}
+                    </Typography>
+                  </Box>
+                </Tooltip>
+                <Tooltip title={"Delete"}>
+                  <EditIcon
+                    onClick={() => {
+                      console.log(card._id, listId);
+                      handleClickDeleteCard(card._id, listId);
+                    }}
+                    sx={{
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      "&:hover": {
+                        color: "grey",
+                      },
+                    }}
+                  />
+                </Tooltip>
+              </div>
+
+              <div>
+                <Typography
+                  onClick={() => handleClickModifyCard(card._id)}
                   sx={{
-                    backgroundColor: backgroundColor[card.position],
+                    fontSize: "14px",
+                    letterSpacing: "0.5px",
+                    lineHeight: "20px",
+                    cursor: "pointer",
                   }}
                 >
-                  <Typography color="white" fontSize="12px">
-                    {card.position}
-                  </Typography>
-                </Box>
-              </Tooltip>
-              <Tooltip title={"Delete"}>
-                <EditIcon
-                  onClick={() => {
-                    console.log(card._id, listId);
-                    handleClickDeleteCard(card._id, listId);
-                  }}
+                  {card.description}
+                </Typography>
+              </div>
+              <Tooltip title={"Edit"}>
+                <NotesIcon
+                  onClick={() => handleClickModifyCard(card._id)}
                   sx={{
-                    fontSize: "13px",
+                    fontSize: "12px",
                     cursor: "pointer",
                     "&:hover": {
                       color: "grey",
                     },
                   }}
-                />
+                ></NotesIcon>
               </Tooltip>
-              <Dialog open={modalProps.openDelete} onClose={handleCloseDelete}>
-                <DialogTitle>
-                  {"Are you sure you want to delete this card from your list?"}
-                </DialogTitle>
-                <DialogContent>
-                  <button
-                    type="button"
-                    className="cancel-button"
-                    onClick={handlers.onClickDeleteCard}
-                    style={{ backgroundColor: "red", marginRight: "10px" }}
-                  >
-                    Delete
-                  </button>
-                  <button onClick={handleCloseDelete} className="submit-button">
-                    Back
-                  </button>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div>
-              <Typography
-                onClick={() => handleClickModifyCard(card._id)}
-                sx={{
-                  fontSize: "14px",
-                  letterSpacing: "0.5px",
-                  lineHeight: "20px",
-                  cursor: "pointer",
-                }}
-              >
-                {card.description}
-              </Typography>
-            </div>
-            <Tooltip title={"Edit"}>
-              <NotesIcon
-                onClick={() => handleClickModifyCard(card._id)}
-                sx={{
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  "&:hover": {
-                    color: "grey",
-                  },
-                }}
-              ></NotesIcon>
-            </Tooltip>
-            <DialogComp stateProps={stateProps} handlers={handlerProps} />
-          </Box>
-        </Paper>
-      </Box>
+            </Box>
+          </Paper>
+        </Box>
+        <Dialog open={modalProps.openDelete} onClose={handleCloseDelete}>
+          <DialogTitle>
+            {"Are you sure you want to delete this card from your list?"}
+          </DialogTitle>
+          <DialogContent>
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={handlers.onClickDeleteCard}
+              style={{ backgroundColor: "red", marginRight: "10px" }}
+            >
+              Delete
+            </button>
+            <button onClick={handleCloseDelete} className="submit-button">
+              Back
+            </button>
+          </DialogContent>
+        </Dialog>
+        <DialogComp stateProps={stateProps} handlers={handlerProps} />
+      </div>
     </div>
   );
 }

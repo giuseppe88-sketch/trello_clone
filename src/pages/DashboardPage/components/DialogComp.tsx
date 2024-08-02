@@ -14,10 +14,10 @@ export interface handlerProps {
 }
 
 export interface stateProps {
-  cardTitle: string;
-  description: string;
+  cardTitle?: string;
+  description?: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
-  position: number;
+  position?: number;
   setPosition: React.Dispatch<React.SetStateAction<number>>;
   open: boolean;
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -39,7 +39,6 @@ function DialogComp({ handlers, stateProps, type }: Props) {
     setPosition,
     open,
   } = stateProps;
-  console.log(position)
 
   return (
     <div>
@@ -99,76 +98,80 @@ function DialogComp({ handlers, stateProps, type }: Props) {
                 },
               }}
             />
-            <TextField
-              margin="dense"
-              id="description"
-              label={"description"}
-              type="text"
-              fullWidth
-              value={description}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDescription(event.target.value);
-              }}
-              InputProps={{
-                sx: {
-                  color: "#fff", // Change text color
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color
+            {description && (
+              <TextField
+                margin="dense"
+                id="description"
+                label={"description"}
+                type="text"
+                fullWidth
+                value={description}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setDescription(event.target.value);
+                }}
+                InputProps={{
+                  sx: {
+                    color: "#fff", // Change text color
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color on hover
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color when focused
+                    },
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color on hover
+                }}
+                InputLabelProps={{
+                  sx: {
+                    color: "#B6C2CF", // Change label color
+                    "&.Mui-focused": {
+                      color: "#B6C2CF", // Change label color when focused
+                    },
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color when focused
-                  },
-                },
-              }}
-              InputLabelProps={{
-                sx: {
-                  color: "#B6C2CF", // Change label color
-                  "&.Mui-focused": {
-                    color: "#B6C2CF", // Change label color when focused
-                  },
-                },
-              }}
-            />
+                }}
+              />
+            )}
 
-            <TextField
-              margin="dense"
-              id="number"
-              label={
-                (type === "Add" && "Position") || (type === "Put" && position)
-              }
-              type="number"
-              value={position}
-              onChange={(e) => {
-                setPosition(parseInt(e.target.value));
-              }}
-              inputProps={{ min: 1, max: 5 }}
-              fullWidth
-              InputProps={{
-                sx: {
-                  color: "#B6C2CF", // Change text color
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color
+            {position && (
+              <TextField
+                margin="dense"
+                id="number"
+                label={
+                  (type === "Add" && "Position") || (type === "Put" && position)
+                }
+                type="number"
+                value={position}
+                onChange={(e) => {
+                  setPosition(parseInt(e.target.value));
+                }}
+                inputProps={{ min: 1, max: 5 }}
+                fullWidth
+                InputProps={{
+                  sx: {
+                    color: "#B6C2CF", // Change text color
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color on hover
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#B6C2CF", // Change border color when focused
+                    },
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color on hover
+                }}
+                InputLabelProps={{
+                  sx: {
+                    color: "#B6C2CF", // Change label color
+                    "&.Mui-focused": {
+                      color: "#B6C2CF", // Change label color when focused
+                    },
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#B6C2CF", // Change border color when focused
-                  },
-                },
-              }}
-              InputLabelProps={{
-                sx: {
-                  color: "#B6C2CF", // Change label color
-                  "&.Mui-focused": {
-                    color: "#B6C2CF", // Change label color when focused
-                  },
-                },
-              }}
-            />
+                }}
+              />
+            )}
             <DialogActions>
               <button
                 type="button"

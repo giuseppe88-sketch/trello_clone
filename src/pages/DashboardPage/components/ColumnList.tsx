@@ -2,15 +2,17 @@
 import React from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import "../DashboardPage.scss";
-
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import AddIcon from "@mui/icons-material/Add";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Cards from "./Cards";
 import DialogComp from "./DialogComp";
 
+import { SortableContext } from "@dnd-kit/sortable";
 export interface ColumnListProps {
-  sortedData: Array<{
+  list: Array<{
     _id: string;
     title: string;
     cards: Array<{
@@ -57,11 +59,12 @@ export interface ColumnListProps {
     handleSubmitModify: (event: React.FormEvent<HTMLFormElement>) => void;
     onClickDeleteCard: (event: React.FormEvent<HTMLFormElement>) => void;
   };
+  // list:any
   // cards: [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }
 export default function ColumnList({
-  sortedData,
+  list,
   listProps,
   cardProps,
   modalProps,
@@ -69,7 +72,6 @@ export default function ColumnList({
 }: ColumnListProps) {
   const handleOpen = () => modalProps.setOpen(true);
   const handleClose = () => modalProps.setOpen(false);
-
   const stateProps = {
     cardTitle: cardProps.cardTitle,
     setCardTitle: cardProps.setCardTitle,
@@ -83,144 +85,185 @@ export default function ColumnList({
     setOpen: modalProps.setOpen,
   };
 
+  const cardIds = React.useMemo(
+    () => list.cards.map((cardId: any) => cardId._id),
+    [list]
+  );
+
   const handlerProps = {
     handleSubmit: handlers.handleSubmit,
     handleClose: handleClose,
   };
+
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: list._id,
+    data: {
+      type: "Column",
+      list,
+    },
+  });
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  };
+
+  if (isDragging) {
+    return (
+      <div ref={setNodeRef} style={style}>
+        <Paper
+          elevation={3}
+          sx={{
+            backgroundColor: "rgba(0,0,0,0.5)",
+            maxHeight: "100%",
+            width: "272px",
+            height: "330px",
+            borderRadius: "13px",
+            cursor: "pointer",
+            overflowY: "auto",
+            scrollBehavior: "smooth",
+          }}
+        ></Paper>
+      </div>
+    );
+  }
   return (
-    <>
-      {sortedData &&
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sortedData.map((list: any) => (
-          <Box key={list.id}>
-            {" "}
-            <Paper
-              elevation={3}
+    <div ref={setNodeRef} style={style}>
+      <Paper
+        elevation={3}
+        sx={{
+          padding: "1px",
+          backgroundColor: "#101204",
+          color: "#c7d3e0",
+          // color: "#d9e5f1",
+          maxHeight: "100%",
+          width: "272px",
+          // minWidth:"272px",
+          borderRadius: "13px",
+          cursor: "pointer",
+          overflowY: "auto",
+          scrollBehavior: "smooth",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "end",
+          }}
+          {...attributes}
+          {...listeners}
+        >
+          <Typography
+            sx={{
+              fontSize: "15px",
+              fontWeight: "600",
+              lineHeight: "20px",
+              overflowWrap: "anywhere",
+            }}
+            m="15px 15px 5px 15px"
+          >
+            {list.title}
+          </Typography>
+          <div></div>
+          <MoreHorizIcon
+            sx={{
+              fontSize: "12px",
+              marginRight: "12px",
+              marginBottom: "10px",
+            }}
+          ></MoreHorizIcon>
+        </div>
+        <SortableContext items={cardIds}>
+          <div
+            style={{
+              maxHeight: "300px",
+              overflowY: "auto",
+              scrollBehavior: "smooth",
+              paddingRight: "8px", // Optional: Add padding to avoid scrollbar overlay
+            }}
+            className="custom-scrollbar"
+            // ref={scrollContainerRef}
+          >
+            {list.cards.map((card: any, index: any) => (
+              <Cards
+                card={card}
+                id={index}
+                listId={list._id}
+                listProps={listProps}
+                cardProps={cardProps}
+                modalProps={modalProps}
+                handlers={handlers}
+              />
+            ))}
+          </div>
+        </SortableContext>
+
+        <div>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: "5px",
+              textTransform: "capitalize",
+              backgroundColor: "transparent",
+              cursor: "pointer",
+              textAlign: "start",
+              "&:hover": {
+                backgroundColor: "grey",
+              },
+            }}
+            onClick={handleOpen}
+          >
+            <Box
               sx={{
-                padding: "1px",
-                backgroundColor: "#101204",
-                color: "#c7d3e0",
-                // color: "#d9e5f1",
-                maxHeight: "100%",
-                width: "272px",
-                // minWidth:"272px",
-                borderRadius: "13px",
-                cursor: "pointer",
-                overflowY: "auto",
-                scrollBehavior: "smooth",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                padding: "10px",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "end",
+              <AddIcon />
+              <Button
+                onClick={() => {
+                  listProps.setListId(list._id);
                 }}
               >
                 <Typography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: "600",
-                    lineHeight: "20px",
-                    overflowWrap: "anywhere",
-                  }}
-                  m="15px 15px 5px 15px"
+                  sx={{ textTransform: "capitalize", color: "white" }}
                 >
-                  {list.title}
+                  Add Card
                 </Typography>
-                <div></div>
-                <MoreHorizIcon
-                  sx={{
-                    fontSize: "12px",
-                    marginRight: "12px",
-                    marginBottom: "10px",
-                  }}
-                ></MoreHorizIcon>
-              </div>
-              <div
-                style={{
-                  maxHeight: "300px",
-                  overflowY: "auto",
-                  scrollBehavior: "smooth",
-                  paddingRight: "8px", // Optional: Add padding to avoid scrollbar overlay
-                }}
-                className="custom-scrollbar"
-                // ref={scrollContainerRef}
-              >
-                {list.cards.map((card: any, index: any) => (
-                  <Cards
-                    card={card}
-                    id={index}
-                    listId={list._id}
-                    listProps={listProps}
-                    cardProps={cardProps}
-                    modalProps={modalProps}
-                    handlers={handlers}
-                  />
-                ))}
-              </div>
-              <div>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginTop: "5px",
-                    textTransform: "capitalize",
-                    backgroundColor: "transparent",
-                    cursor: "pointer",
-                    textAlign: "start",
-                    "&:hover": {
-                      backgroundColor: "grey",
-                    },
-                  }}
-                  onClick={handleOpen}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "7px",
-                      padding: "10px",
-                    }}
-                  >
-                    <AddIcon />
-                    <Button
-                      onClick={() => {
-                        listProps.setListId(list._id);
-                      }}
-                    >
-                      <Typography
-                        sx={{ textTransform: "capitalize", color: "white" }}
-                      >
-                        Add Card
-                      </Typography>
-                    </Button>
-
-                    <DialogComp
-                      stateProps={stateProps}
-                      handlers={handlerProps}
-                      type={"Add"}
-                    />
-                  </Box>
-                  <Box></Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <EditCalendarIcon sx={{ fontSize: "1.0rem" }} />
-                  </Box>
-                </Button>
-              </div>
-            </Paper>
-          </Box>
-        ))}
-    </>
+              </Button>
+            </Box>
+            <Box></Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <EditCalendarIcon sx={{ fontSize: "1.0rem" }} />
+            </Box>
+          </Button>
+        </div>
+      </Paper>
+      <DialogComp
+        stateProps={stateProps}
+        handlers={handlerProps}
+        type={"Add"}
+      />
+    </div>
   );
 }
