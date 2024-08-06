@@ -14,7 +14,7 @@ export interface handlerProps {
 }
 
 export interface stateProps {
-  cardTitle?: string;
+  title?: string;
   description?: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   position?: number;
@@ -22,16 +22,18 @@ export interface stateProps {
   open: boolean;
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogTitle?: string;
 }
 type Props = {
   handlers: handlerProps;
   stateProps: stateProps;
+  dialogTitle?: string;
   type?: string;
 };
-function DialogComp({ handlers, stateProps, type }: Props) {
+function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
   const { handleClose, handleSubmit } = handlers;
   const {
-    cardTitle,
+    title,
     setCardTitle,
     description,
     setDescription,
@@ -60,7 +62,7 @@ function DialogComp({ handlers, stateProps, type }: Props) {
           sx={{ display: "flex", justifyContent: "flex-start" }}
           className="dialog-title"
         >
-          {type === "Add" ? `Adding new Task to ` : `Modify Task to `}
+          {dialogTitle}
         </DialogTitle>
         <DialogContent>
           <form>
@@ -71,7 +73,7 @@ function DialogComp({ handlers, stateProps, type }: Props) {
               label={"title"}
               type="text"
               fullWidth
-              value={cardTitle}
+              value={title}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setCardTitle(event.target.value);
               }}
@@ -98,7 +100,7 @@ function DialogComp({ handlers, stateProps, type }: Props) {
                 },
               }}
             />
-            {description && (
+            {description !== undefined && (
               <TextField
                 margin="dense"
                 id="description"
@@ -138,9 +140,7 @@ function DialogComp({ handlers, stateProps, type }: Props) {
               <TextField
                 margin="dense"
                 id="number"
-                label={
-                  (type === "Add" && "Position") || (type === "Put" && position)
-                }
+                label={"position"}
                 type="number"
                 value={position}
                 onChange={(e) => {

@@ -8,6 +8,8 @@ import {
   moveCardRequest,
   deleteCardRequest,
   putCardRequest,
+  postListRequest,
+  deleteListRequest,
 } from "../services/api";
 
 interface AuthState {
@@ -249,7 +251,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const postList = async (userToken: string | null, title: string | null) => {
-    return moveCardRequest(userToken, title)
+    return postListRequest(userToken, title)
       .then((response) => {
         if (!response) {
           console.error(response);
@@ -257,6 +259,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } else {
           console.log("put Cards from User", response);
           return response;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const deleteList = async (
+    userToken: string | null,
+    listId: string | null
+  ) => {
+    return deleteListRequest(listId, userToken)
+      .then((response) => {
+        if (!response) {
+          console.error(response);
+          return response;
+        } else {
+          console.log("List Deleted from user", response);
         }
       })
       .catch((error) => {
@@ -291,7 +311,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteCard,
         putCard,
         moveCard,
-        postList
+        postList,
+        deleteList,
       }}
     >
       {children}

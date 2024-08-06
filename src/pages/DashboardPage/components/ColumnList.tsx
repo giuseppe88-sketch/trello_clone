@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Box, Paper, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
 import "../DashboardPage.scss";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -9,6 +17,7 @@ import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Cards from "./Cards";
 import DialogComp from "./DialogComp";
+import { AuthContext } from "../../../Context/AuthContext";
 
 import { SortableContext } from "@dnd-kit/sortable";
 export interface ColumnListProps {
@@ -72,8 +81,11 @@ export default function ColumnList({
 }: ColumnListProps) {
   const handleOpen = () => modalProps.setOpen(true);
   const handleClose = () => modalProps.setOpen(false);
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const { deleteList, userToken, getList } = React.useContext(AuthContext);
+
   const stateProps = {
-    cardTitle: cardProps.cardTitle,
+    title: cardProps.cardTitle,
     setCardTitle: cardProps.setCardTitle,
     description: cardProps.cardDescription,
     setDescription: cardProps.setCardDescription,
@@ -84,7 +96,6 @@ export default function ColumnList({
     open: modalProps.open,
     setOpen: modalProps.setOpen,
   };
-
   const cardIds = React.useMemo(
     () => list.cards.map((cardId: any) => cardId._id),
     [list]
@@ -95,6 +106,35 @@ export default function ColumnList({
     handleClose: handleClose,
   };
 
+  function onCloseDelete() {
+    setOpenDialog(false);
+  }
+
+  const onClickDeleteList =
+    (listId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      console.log("triggered onClickDeleteList");
+      deleteList(listId, userToken)
+        .then((result: any) => {
+          console.log("list deleted successfully:", result);
+          // setAlert("Card deleted successfully");
+          // setOpenAlert(true);
+          // setIsError(false);
+          // setCardId(null);
+          // setListId(null);
+        })
+        .then(() => {
+          getList(userToken).then(() => console.log("List"));
+          setOpenDialog(false);
+        })
+
+        .catch((error: any): any => {
+          // setAlert("error deleting card");
+          // setOpenAlert(true);
+          // setIsError(true);
+          console.error("Error deleting card:", error);
+        });
+    };
   const {
     setNodeRef,
     attributes,
@@ -143,8 +183,9 @@ export default function ColumnList({
           color: "#c7d3e0",
           // color: "#d9e5f1",
           maxHeight: "100%",
+          height: "100%",
           width: "272px",
-          // minWidth:"272px",
+          minWidth: "72px",
           borderRadius: "13px",
           cursor: "pointer",
           overflowY: "auto",
@@ -173,6 +214,9 @@ export default function ColumnList({
           </Typography>
           <div></div>
           <MoreHorizIcon
+            onClick={() => {
+              setOpenDialog(true);
+            }}
             sx={{
               fontSize: "12px",
               marginRight: "12px",
@@ -262,8 +306,25 @@ export default function ColumnList({
       <DialogComp
         stateProps={stateProps}
         handlers={handlerProps}
-        type={"Add"}
+        dialogTitle="Adding a new task"
       />
+      <Dialog open={openDialog} onClose={onCloseDelete}>
+        <DialogTitle>{"Are you sure you want to delete this list"}</DialogTitle>
+        <DialogContent>
+          <button
+            type="button"
+            className="cancel-button"
+            // onClick={onClickDeleteList}
+            onClick={onClickDeleteList(list._id)}
+            style={{ backgroundColor: "red", marginRight: "10px" }}
+          >
+            Delete
+          </button>
+          <button onClick={onCloseDelete} className="submit-button">
+            Back
+          </button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

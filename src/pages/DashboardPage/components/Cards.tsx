@@ -13,12 +13,7 @@ import {
 import NotesIcon from "@mui/icons-material/Notes";
 import EditIcon from "@mui/icons-material/Edit";
 import DialogComp from "./DialogComp";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -99,7 +94,7 @@ function Cards({
   };
   const stateProps = {
     // listTitle,
-    cardTitle: cardProps.cardTitle,
+    title: cardProps.cardTitle,
     setCardTitle: cardProps.setCardTitle,
     description: cardProps.cardDescription,
     setDescription: cardProps.setCardDescription,
@@ -262,7 +257,7 @@ function Cards({
             </button>
           </DialogContent>
         </Dialog>
-        <DialogComp stateProps={stateProps} handlers={handlerProps} />
+        <DialogComp stateProps={stateProps} handlers={handlerProps} dialogTitle={"Edit"} />
       </div>
     </div>
   );

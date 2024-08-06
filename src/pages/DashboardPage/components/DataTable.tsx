@@ -70,12 +70,13 @@ function DataTable({
   alertProps,
   handlers,
 }: DataTableProps) {
+  const [title, setTitle] = React.useState("");
   const [activeColumn, setActiveColumn] = React.useState<any>(null);
   const [activeCard, setActiveCard] = React.useState<any>(null);
-  const { setData, moveCard, userToken, getCards, data } =
+  const { setData, moveCard, userToken, getCards, getList, data, postList } =
     React.useContext(AuthContext);
 
-    const [open, setOpen]=React.useState(null)
+  const [open, setOpen] = React.useState<boolean | null>(null);
 
   const columnsId = React.useMemo(
     () => sortedData.map((list) => list._id),
@@ -206,10 +207,49 @@ function DataTable({
     }
   }
 
-  // const stateProps = {
-  //   open,
-  //   cardTitle:
-  // };
+  const handleClose = () => setOpen(false);
+
+  const handleSubmit = () => {
+    if (!title) {
+      alertProps.setAlert("Title is required");
+      return;
+    }
+    postList(userToken, title)
+      .then((result: any) => {
+        console.log("result", result);
+        if (!result || result === undefined) {
+          setOpen(false);
+          alertProps.setAlert("error occurred while submitting");
+          // alertProps.setIsError(true);
+          // setOpenAlert(true); // const [openDelete, setOpenDelete] = React.useState(false);
+
+          return;
+        }
+        console.log("List added successfully:", result);
+        setTitle("");
+      })
+      .then(() => {
+        getList(userToken).then(() => {
+          console.log("List refreshed successfully");
+        });
+      })
+
+      .catch((error): any => {
+        console.error("Error adding card:", error);
+        // Handle error appropriately
+      });
+    setOpen(false);
+  };
+  const stateProps = {
+    open,
+    title,
+    setCardTitle: setTitle,
+  };
+
+  const handlerProps = {
+    handleClose,
+    handleSubmit,
+  };
 
   return (
     <div>
@@ -249,11 +289,11 @@ function DataTable({
                 padding: "1px",
                 backgroundColor: "#ffffff3d",
                 maxHeight: "50px",
-                width: "272px",
+                minWidth: "270px",
                 borderRadius: "13px",
               }}
             >
-              <Button>
+              <Button onClick={() => setOpen(true)}>
                 <Box
                   sx={{
                     height: "100%",
@@ -273,7 +313,11 @@ function DataTable({
                 </Box>
               </Button>
             </Paper>
-            {/* <DialogComp stateProps={stateProps} handlers={handlers} /> */}
+            <DialogComp
+              stateProps={stateProps}
+              handlers={handlerProps}
+              dialogTitle={"Adding a new list"}
+            />
             <Snackbar
               open={alertProps.openAlert}
               autoHideDuration={6000}

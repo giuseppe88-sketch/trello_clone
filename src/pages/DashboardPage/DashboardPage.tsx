@@ -10,13 +10,13 @@ import MainAppbar from "./components/MainAppbar";
 import Navbar from "./components/Navbar";
 
 import DataTable from "./components/DataTable";
+import { Box } from "@mui/material";
 
 const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
 
 export default function DashboardPage() {
   const {
     userToken,
-
     getCards,
     data,
     setData,
@@ -215,7 +215,7 @@ export default function DashboardPage() {
             backgroundImage: `url(${backgroundImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
+            backgroundRepeat: "repeat",
             borderRadius: "10px",
             boxShadow: "inset 10px 10px 30px rgba(0, 0, 0, 1.5)",
           }}
@@ -231,7 +231,10 @@ export default function DashboardPage() {
           />
           <Navbar />
 
-          <>
+          <Box
+            sx={{ overflowX: "auto", scrollBehavior: "smoot", height: "100vh" }}
+            // className="custom-scrollbar"
+          >
             <DataTable
               sortedData={sortedData}
               listProps={listProps}
@@ -240,7 +243,7 @@ export default function DashboardPage() {
               alertProps={alertProps}
               handlers={handlers}
             />
-          </>
+          </Box>
         </div>
       ) : (
         "USER NOT AUTHENTICATED"
