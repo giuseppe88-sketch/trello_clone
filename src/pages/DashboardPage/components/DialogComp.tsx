@@ -55,7 +55,11 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
           color: "white",
         }}
         PaperProps={{
-          sx: { backgroundColor: "#3e4b57", color: "white" },
+          sx: {
+            backgroundColor: "#3e4b57",
+            color: "white",
+            borderRadius: "25px",
+          },
         }}
       >
         <DialogTitle
@@ -82,6 +86,7 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
                   color: "#fff", // Change text color
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#ccc", // Change border color
+                    borderRadius: 3, // Change border radius
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#fff", // Change border color on hover
@@ -113,23 +118,24 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
                 }}
                 InputProps={{
                   sx: {
-                    color: "#fff", // Change text color
+                    color: "#fff",
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#B6C2CF", // Change border color
+                      borderColor: "#B6C2CF",
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#B6C2CF", // Change border color on hover
+                      borderColor: "#B6C2CF",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#B6C2CF", // Change border color when focused
+                      borderColor: "#B6C2CF",
                     },
+                    borderRadius: 3,
                   },
                 }}
                 InputLabelProps={{
                   sx: {
-                    color: "#B6C2CF", // Change label color
+                    color: "#B6C2CF",
                     "&.Mui-focused": {
-                      color: "#B6C2CF", // Change label color when focused
+                      color: "#B6C2CF",
                     },
                   },
                 }}
@@ -160,6 +166,7 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                       borderColor: "#B6C2CF", // Change border color when focused
                     },
+                    borderRadius: 3,
                   },
                 }}
                 InputLabelProps={{

@@ -117,11 +117,6 @@ export default function ColumnList({
       deleteList(listId, userToken)
         .then((result: any) => {
           console.log("list deleted successfully:", result);
-          // setAlert("Card deleted successfully");
-          // setOpenAlert(true);
-          // setIsError(false);
-          // setCardId(null);
-          // setListId(null);
         })
         .then(() => {
           getList(userToken).then(() => console.log("List"));
@@ -129,9 +124,6 @@ export default function ColumnList({
         })
 
         .catch((error: any): any => {
-          // setAlert("error deleting card");
-          // setOpenAlert(true);
-          // setIsError(true);
           console.error("Error deleting card:", error);
         });
     };
@@ -174,7 +166,7 @@ export default function ColumnList({
     );
   }
   return (
-    <div ref={setNodeRef} style={style}>
+    <div ref={setNodeRef} style={style} >
       <Paper
         elevation={3}
         sx={{
@@ -227,7 +219,7 @@ export default function ColumnList({
         <SortableContext items={cardIds}>
           <div
             style={{
-              maxHeight: "300px",
+              maxHeight: "65vh",
               overflowY: "auto",
               scrollBehavior: "smooth",
               paddingRight: "8px", // Optional: Add padding to avoid scrollbar overlay

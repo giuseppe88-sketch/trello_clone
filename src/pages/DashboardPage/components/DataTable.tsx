@@ -69,6 +69,8 @@ function DataTable({
   modalProps,
   alertProps,
   handlers,
+  formState,
+  setFormState,
 }: DataTableProps) {
   const [title, setTitle] = React.useState("");
   const [activeColumn, setActiveColumn] = React.useState<any>(null);
