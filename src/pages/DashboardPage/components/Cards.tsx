@@ -12,12 +12,13 @@ import {
 
 import NotesIcon from "@mui/icons-material/Notes";
 import EditIcon from "@mui/icons-material/Edit";
-import DialogComp from "./DialogComp";
+import DialogForm, { stateProps } from "./DialogForm";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { CardProps } from "../DashboardPage";
 
-export interface CardsProps {
+export interface CardsPropsObject {
   card: any;
   id: any;
   listId: string;
@@ -25,15 +26,7 @@ export interface CardsProps {
     setListId: React.Dispatch<React.SetStateAction<string | null>>;
     listId: string | null;
   };
-  cardProps: {
-    setCardTitle: React.Dispatch<React.SetStateAction<string>>;
-    cardTitle: string;
-    setCardDescription: React.Dispatch<React.SetStateAction<string>>;
-    cardDescription: string;
-    setCardId: React.Dispatch<React.SetStateAction<string | null>>;
-    position: number | null;
-    setPosition: React.Dispatch<React.SetStateAction<number | null>>;
-  };
+  cardProps: CardProps;
   modalProps: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -57,7 +50,7 @@ function Cards({
   cardProps,
   modalProps,
   handlers,
-}: CardsProps) {
+}: CardsPropsObject) {
   const backgroundColor: { [key: number]: string } = {
     1: "#206A83",
     2: "#216E4E",
@@ -77,7 +70,6 @@ function Cards({
     modalProps.setOpenModify(false);
   };
   const handleOpen = () => modalProps.setOpenModify(true);
-  // const handleClose = () => setOpenModify(false);
 
   const handleClickDeleteCard = (
     cardId: string | null,
@@ -92,21 +84,17 @@ function Cards({
     handleOpen();
     modalProps.setOpenModify(true);
   };
-  const stateProps = {
-    // listTitle,
+  const stateProps: stateProps = {
     title: cardProps.cardTitle,
     setCardTitle: cardProps.setCardTitle,
     description: cardProps.cardDescription,
     setDescription: cardProps.setCardDescription,
     position: cardProps.position,
-    setPosition: cardProps.setPosition as React.Dispatch<
-      React.SetStateAction<number>
-    >,
+    setPosition: cardProps.setPosition,
     open: modalProps.openModify,
     setOpen: modalProps.setOpenModify,
   };
 
-  // const [openDelete, setOpenDelete] = React.useState(false);
   const handlerProps = {
     handleSubmit: handlers.handleSubmitModify,
     handleClose: handleCloseModify,
@@ -141,10 +129,10 @@ function Cards({
             color: "#B6C2CF",
             margin: "10px",
             backgroundColor: "#22272af1",
-            opacity:.75,
+            opacity: 0.75,
             borderRadius: "2px",
             boxShadow: "inset 4px 4px 8px rgba(0, 0, 0, 0.1)",
-            height:"20px"
+            height: "20px",
           }}
         ></Paper>
       </div>
@@ -257,7 +245,11 @@ function Cards({
             </button>
           </DialogContent>
         </Dialog>
-        <DialogComp stateProps={stateProps} handlers={handlerProps} dialogTitle={"Edit"} />
+        <DialogForm
+          stateProps={stateProps}
+          handlers={handlerProps}
+          dialogTitle={"Edit"}
+        />
       </div>
     </div>
   );

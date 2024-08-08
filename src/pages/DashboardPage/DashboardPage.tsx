@@ -12,14 +12,23 @@ import Navbar from "./components/Navbar";
 import DataTable from "./components/DataTable";
 import { Box } from "@mui/material";
 
-const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
+// const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
 
+export interface CardProps {
+  setCardTitle: React.Dispatch<React.SetStateAction<string>>;
+  cardTitle: string | null;
+  setCardDescription: React.Dispatch<React.SetStateAction<string | null>>;
+  cardDescription: string | null;
+  setCardId: React.Dispatch<React.SetStateAction<string | null>>;
+  position: number | null;
+  setPosition: React.Dispatch<React.SetStateAction<number | null>>;
+}
 export default function DashboardPage() {
   const {
     userToken,
     getCards,
-    data,
-    setData,
+    dataList,
+    // setDataList,
     dataCards,
     postCard,
     setListId,
@@ -31,8 +40,8 @@ export default function DashboardPage() {
   } = useContext(AuthContext);
 
   const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [position, setPosition] = useState<number>(1);
+  const [description, setDescription] = useState<string | null>("");
+  const [position, setPosition] = useState<number | null>(1);
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [openModify, setOpenModify] = React.useState<boolean>(false);
@@ -53,7 +62,7 @@ export default function DashboardPage() {
             setOpen(false);
             setAlert("error occurred while submitting");
             setIsError(true);
-            setOpenAlert(true); // const [openDelete, setOpenDelete] = React.useState(false);
+            setOpenAlert(true);
 
             return;
           }
@@ -145,7 +154,7 @@ export default function DashboardPage() {
     if (reason === "clickaway") {
       return;
     }
-    setOpenAlert(false); // Close the Snackbar
+    setOpenAlert(false);
   };
 
   const listProps = {
@@ -153,7 +162,7 @@ export default function DashboardPage() {
     listId: listId,
   };
 
-  const cardProps = {
+  const cardProps: CardProps = {
     setCardTitle: setTitle,
     cardTitle: title,
     setCardDescription: setDescription,
@@ -187,7 +196,8 @@ export default function DashboardPage() {
   };
 
   const sortedData = React.useMemo(() => {
-    return data.map((list: any) => {
+    console.log(dataList);
+    return dataList.map((list: any) => {
       // Create a mapping from cardId to index in the original list.cards array
       const cardOrderMap = list.cards.reduce(
         (acc: any, card: any, index: number) => {
@@ -204,7 +214,7 @@ export default function DashboardPage() {
         });
       return { ...list, cards };
     });
-  }, [data, dataCards]);
+  }, [dataList, dataCards]);
 
   return (
     <>

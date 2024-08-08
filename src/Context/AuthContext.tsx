@@ -12,6 +12,20 @@ import {
   deleteListRequest,
 } from "../services/api";
 
+export interface Card {
+  _id: string;
+  title: string;
+  description: string;
+  position: number;
+  listId: string;
+}
+
+export interface List {
+  _id: string;
+  title: string;
+  cards: Card[];
+}
+
 interface AuthState {
   isAuthenticated: boolean;
   loginRequest: (username: string, password: string) => Promise<void>;
@@ -23,7 +37,13 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   userToken: string | null;
-  dataCards: [];
+  dataCards: {
+    _id: string;
+    title: string;
+    description: string;
+    position: number;
+    listId: string;
+  }[];
   getList: (userToken: string | null) => Promise<void>;
   getCards: (userToken: string | null) => Promise<void>;
   setListId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -35,8 +55,8 @@ interface AuthState {
     userToken: string | null,
     position: number | null
   ) => Promise<void>;
-  data: [];
-  setData: (data: []) => void;
+  dataList: List[];
+  setDataList: React.Dispatch<React.SetStateAction<List[]>>;
   listId: string | null;
   cardId: string | null;
   deleteCard: (
@@ -51,6 +71,13 @@ interface AuthState {
     description: string | null,
     position: number | null
   ) => Promise<void>;
+  moveCard: (
+    cardId: string | null,
+    userToken: string | null,
+    listId: string | null
+  ) => Promise<void>;
+  postList: (title: string | null, userToken: string | null) => Promise<void>;
+  deleteList: (title: string | null, userToken: string | null) => Promise<void>;
 }
 
 const initialAuthState: AuthState = {
@@ -66,9 +93,18 @@ const initialAuthState: AuthState = {
   setListId: async () => {},
   setCardId: async () => {},
   postCard: async () => {},
+  postList: async () => {},
+  deleteList: async () => {},
   putCard: async () => {},
-  data: [],
-  setData: async () => {},
+  moveCard: async () => {},
+  dataList: [
+    {
+      _id: "",
+      title: "",
+      cards: [],
+    },
+  ],
+  setDataList: async () => {},
   listId: null,
   cardId: null,
 };
@@ -86,11 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userToken, setUserToken] = useState<string | null>(
     localStorage.getItem("token")
   );
-  const [data, setData] = useState<[]>([]);
+  const [dataList, setDataList] = useState<AuthState["dataList"]>([]);
   const [dataCards, setDataCards] = useState<[]>([]);
   const [listId, setListId] = useState<string | null>(null); // New state for listId
-  const [cardId, setCardId] = useState<string>(""); // New state for listId
-
+  const [cardId, setCardId] = useState<string | null>(""); // New state for listId
   const loginRequest = async (username: string, password: string) => {
     return login(username, password)
       .then((response) => {
@@ -132,7 +167,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getList = async (userToken: string | null) => {
     return getListRequest(userToken)
       .then((response) => {
@@ -141,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           return response;
         } else {
           console.log("Fetch List from User", response);
-          setData(response);
+          setDataList(response);
         }
       })
       .catch((error) => {
@@ -153,7 +187,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsAuthenticated(false);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getCards = async (userToken: string | null) => {
     return getCardsRequest(userToken)
       .then((response) => {
@@ -171,9 +204,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const postCard = async (
-    title: string,
-    description: string,
-    listId: string,
+    title: string | null,
+    description: string | null,
+    listId: string | null,
     userToken: string | null,
     position: number | null
   ) => {
@@ -290,6 +323,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       getList(userToken);
     }
   }, [userToken]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -300,8 +334,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         registerRequest,
         getCards,
         getList,
-        data,
-        setData, // for dashboard page to fetch data and update it.
+        dataList,
+        setDataList, // for dashboard page to fetch data and update it.
         dataCards,
         postCard,
         setListId, // for dashboard page to set listId.

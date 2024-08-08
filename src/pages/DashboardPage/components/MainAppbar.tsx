@@ -36,16 +36,15 @@ const MainAppbar: React.FC<MainAppbarProps> = ({
           root: {
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: "#dfe1e6", // Set the default border color to grey
+                borderColor: "#dfe1e6",
                 border: "0.5px solid #dfe1e6",
                 boxShadow: "inset 0 0 0 1px #738496",
               },
               "&:hover fieldset": {
-                backgroundColor: "#5f6e8810", // Set the background
-                // backgroundColor: "#0000003d", // Set the background
+                backgroundColor: "#5f6e8810", 
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#dfe1e6", // Set the border color when focused to grey
+                borderColor: "#dfe1e6", 
                 boxShadow: "inset 0 0 0 1px #738496",
                 border: "0.5px solid",
               },
@@ -57,10 +56,10 @@ const MainAppbar: React.FC<MainAppbarProps> = ({
         styleOverrides: {
           input: {
             "&::placeholder": {
-              color: "grey", // Set the placeholder text color to grey
-              opacity: 1, // Ensure the placeholder text is fully opaque
+              color: "grey", 
+              opacity: 1, 
             },
-            fontSize: "0.7rem", // Set the font size of the input text
+            fontSize: "0.7rem",
           },
         },
       },
@@ -87,7 +86,7 @@ const MainAppbar: React.FC<MainAppbarProps> = ({
             sx={{
               cursor: "pointer",
               "&:hover": {
-                color: "grey", // Change color on hover
+                color: "grey", 
               },
             }}
           />

@@ -16,35 +16,25 @@ import AddIcon from "@mui/icons-material/Add";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Cards from "./Cards";
-import DialogComp from "./DialogComp";
-import { AuthContext } from "../../../Context/AuthContext";
+import DialogForm from "./DialogForm";
+import { AuthContext, Card } from "../../../Context/AuthContext";
 
 import { SortableContext } from "@dnd-kit/sortable";
+import { CardProps } from "../DashboardPage";
+import { stateProps } from "./DialogForm";
+
+export interface List {
+  _id: string;
+  title: string;
+  cards: Card[];
+}
 export interface ColumnListProps {
-  list: Array<{
-    _id: string;
-    title: string;
-    cards: Array<{
-      _id: string;
-      title: string;
-      description: string;
-      position: number;
-      listId: string;
-    }>;
-  }>;
+  list: List;
   listProps: {
     setListId: React.Dispatch<React.SetStateAction<string | null>>;
     listId: string | null;
   };
-  cardProps: {
-    setCardTitle: React.Dispatch<React.SetStateAction<string>>;
-    cardTitle: string;
-    setCardDescription: React.Dispatch<React.SetStateAction<string>>;
-    cardDescription: string;
-    setCardId: React.Dispatch<React.SetStateAction<string | null>>;
-    position: number | null;
-    setPosition: React.Dispatch<React.SetStateAction<number | null>>;
-  };
+  cardProps: CardProps;
   modalProps: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -68,8 +58,6 @@ export interface ColumnListProps {
     handleSubmitModify: (event: React.FormEvent<HTMLFormElement>) => void;
     onClickDeleteCard: (event: React.FormEvent<HTMLFormElement>) => void;
   };
-  // list:any
-  // cards: [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }
 export default function ColumnList({
@@ -84,15 +72,13 @@ export default function ColumnList({
   const [openDialog, setOpenDialog] = React.useState<boolean>(false);
   const { deleteList, userToken, getList } = React.useContext(AuthContext);
 
-  const stateProps = {
+  const stateProps: stateProps = {
     title: cardProps.cardTitle,
     setCardTitle: cardProps.setCardTitle,
     description: cardProps.cardDescription,
     setDescription: cardProps.setCardDescription,
     position: cardProps.position,
-    setPosition: cardProps.setPosition as React.Dispatch<
-      React.SetStateAction<number>
-    >,
+    setPosition: cardProps.setPosition,
     open: modalProps.open,
     setOpen: modalProps.setOpen,
   };
@@ -111,15 +97,16 @@ export default function ColumnList({
   }
 
   const onClickDeleteList =
-    (listId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
+    (listId: string | null) => (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      console.log("triggered onClickDeleteList");
       deleteList(listId, userToken)
         .then((result: any) => {
           console.log("list deleted successfully:", result);
         })
         .then(() => {
-          getList(userToken).then(() => console.log("List"));
+          getList(userToken).then(() =>
+            console.log("Lists refreshed successfully")
+          );
           setOpenDialog(false);
         })
 
@@ -169,11 +156,11 @@ export default function ColumnList({
     <div ref={setNodeRef} style={style} >
       <Paper
         elevation={3}
+        key={list._id}
         sx={{
           padding: "1px",
           backgroundColor: "#101204",
           color: "#c7d3e0",
-          // color: "#d9e5f1",
           maxHeight: "100%",
           height: "100%",
           width: "272px",
@@ -229,6 +216,7 @@ export default function ColumnList({
           >
             {list.cards.map((card: any, index: any) => (
               <Cards
+                key={card._id}
                 card={card}
                 id={index}
                 listId={list._id}
@@ -295,7 +283,7 @@ export default function ColumnList({
           </Button>
         </div>
       </Paper>
-      <DialogComp
+      <DialogForm
         stateProps={stateProps}
         handlers={handlerProps}
         dialogTitle="Adding a new task"
@@ -306,7 +294,6 @@ export default function ColumnList({
           <button
             type="button"
             className="cancel-button"
-            // onClick={onClickDeleteList}
             onClick={onClickDeleteList(list._id)}
             style={{ backgroundColor: "red", marginRight: "10px" }}
           >

@@ -12,7 +12,9 @@ import ColumnList from "./ColumnList";
 import { createPortal } from "react-dom";
 import Cards from "./Cards";
 import AddIcon from "@mui/icons-material/Add";
-import DialogComp from "./DialogComp";
+import DialogForm from "./DialogForm";
+import { CardProps } from "../DashboardPage";
+import { stateProps } from "./DialogForm";
 export interface DataTableProps {
   sortedData: Array<{
     _id: string;
@@ -29,15 +31,7 @@ export interface DataTableProps {
     setListId: React.Dispatch<React.SetStateAction<string | null>>;
     listId: string | null;
   };
-  cardProps: {
-    setCardTitle: React.Dispatch<React.SetStateAction<string>>;
-    cardTitle: string;
-    setCardDescription: React.Dispatch<React.SetStateAction<string>>;
-    cardDescription: string;
-    setCardId: React.Dispatch<React.SetStateAction<string | null>>;
-    position: number | null;
-    setPosition: React.Dispatch<React.SetStateAction<number | null>>;
-  };
+  cardProps: CardProps;
   modalProps: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,16 +63,14 @@ function DataTable({
   modalProps,
   alertProps,
   handlers,
-  formState,
-  setFormState,
 }: DataTableProps) {
-  const [title, setTitle] = React.useState("");
+  const [title, setTitle] = React.useState<string>("");
   const [activeColumn, setActiveColumn] = React.useState<any>(null);
   const [activeCard, setActiveCard] = React.useState<any>(null);
-  const { setData, moveCard, userToken, getCards, getList, data, postList } =
+  const { setDataList, moveCard, userToken, getCards, getList, postList } =
     React.useContext(AuthContext);
 
-  const [open, setOpen] = React.useState<boolean | null>(null);
+  const [open, setOpen] = React.useState<boolean>(false);
 
   const columnsId = React.useMemo(
     () => sortedData.map((list) => list._id),
@@ -103,16 +95,15 @@ function DataTable({
   }
 
   const handleDragEnd = React.useCallback(
-    (event) => {
+    (event: any) => {
       setActiveColumn(null);
       setActiveCard(null);
       const { over, active } = event;
-      console.log(event);
 
       if (!over) return;
 
-      let activeCardIndex: number;
-      let overCardIndex: number;
+      let activeCardIndex: number | null = null;
+      let overCardIndex: number | null = null;
 
       for (const column of sortedData) {
         const cardIndex = column.cards.findIndex(
@@ -139,13 +130,13 @@ function DataTable({
       const isOverATask = over.data.current.type === "Card";
 
       if (activeColumnIndex !== -1 || overColumnIndex !== -1) {
-        setData((data: any[]) => {
-          const activeColumn = data.findIndex(
-            (data) => data._id === activeColumnId
+        setDataList((dataList: any[]) => {
+          const activeColumn = dataList.findIndex(
+            (dataList) => dataList._id === activeColumnId
           );
 
-          const overColumn = data.findIndex(
-            (data) => data._id === overColumnId
+          const overColumn = dataList.findIndex(
+            (dataList) => dataList._id === overColumnId
           );
 
           return arrayMove(sortedData, overColumn, activeColumn);
@@ -153,7 +144,7 @@ function DataTable({
       } else if (activeCardIndex !== -1 && overCardIndex !== -1) {
         const newColumns = [...sortedData];
         // Find the active column containing the active card
-        let activeColumn;
+        let activeColumn: (typeof newColumns)[0] | undefined;
         newColumns.forEach((column) => {
           if (column.cards.some((card) => card._id === active.id)) {
             activeColumn = column;
@@ -162,10 +153,10 @@ function DataTable({
 
         if (activeColumn) {
           const oldIndex = activeColumn.cards.findIndex(
-            (objCard) => objCard._id === active.id
+            (objCard: any) => objCard._id === active.id
           );
           const newIndex = activeColumn.cards.findIndex(
-            (objCard) => objCard._id === over.id
+            (objCard: any) => objCard._id === over.id
           );
 
           if (oldIndex !== -1 && newIndex !== -1) {
@@ -176,12 +167,9 @@ function DataTable({
             );
           }
         }
-        setData(newColumns);
+        setDataList(newColumns);
       } else if (isActiveATask && isOverATask) {
-        console.log("ActiveATask");
-
         const activeTaskId = active.id;
-        // const overTaskId = over.id;
         const overTaskColumnId = over.data.current.card["listId"];
 
         moveCard(activeTaskId, userToken, overTaskColumnId)
@@ -199,11 +187,10 @@ function DataTable({
           });
       }
     },
-    [setData, sortedData]
+    [setDataList, sortedData]
   );
   function handleDragOver(event: any) {
-    const { active, over } = event;
-    console.log(event);
+    const { over } = event;
     if (over && over.data.current.type === "Column") {
       console.log("Dragged over a Column");
     }
@@ -218,13 +205,9 @@ function DataTable({
     }
     postList(userToken, title)
       .then((result: any) => {
-        console.log("result", result);
         if (!result || result === undefined) {
           setOpen(false);
           alertProps.setAlert("error occurred while submitting");
-          // alertProps.setIsError(true);
-          // setOpenAlert(true); // const [openDelete, setOpenDelete] = React.useState(false);
-
           return;
         }
         console.log("List added successfully:", result);
@@ -236,13 +219,13 @@ function DataTable({
         });
       })
 
-      .catch((error): any => {
+      .catch((error: any): any => {
         console.error("Error adding card:", error);
         // Handle error appropriately
       });
     setOpen(false);
   };
-  const stateProps = {
+  const stateProps: stateProps = {
     open,
     title,
     setCardTitle: setTitle,
@@ -315,7 +298,7 @@ function DataTable({
                 </Box>
               </Button>
             </Paper>
-            <DialogComp
+            <DialogForm
               stateProps={stateProps}
               handlers={handlerProps}
               dialogTitle={"Adding a new list"}
@@ -355,6 +338,8 @@ function DataTable({
                 cardProps={cardProps}
                 modalProps={modalProps}
                 handlers={handlers}
+                id={undefined}
+                listId={""}
               />
             )}
           </DragOverlay>,

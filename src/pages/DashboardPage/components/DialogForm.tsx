@@ -14,15 +14,14 @@ export interface handlerProps {
 }
 
 export interface stateProps {
-  title?: string;
-  description?: string;
-  setDescription: React.Dispatch<React.SetStateAction<string>>;
-  position?: number;
-  setPosition: React.Dispatch<React.SetStateAction<number>>;
+  title: string | null;
+  description?: string | null;
+  setDescription?: React.Dispatch<React.SetStateAction<string | null>>;
+  position?: number| null;
+  setPosition?: React.Dispatch<React.SetStateAction<number | null>>;
   open: boolean;
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  dialogTitle?: string;
 }
 type Props = {
   handlers: handlerProps;
@@ -30,7 +29,7 @@ type Props = {
   dialogTitle?: string;
   type?: string;
 };
-function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
+function DialogForm({ handlers, stateProps, dialogTitle }: Props) {
   const { handleClose, handleSubmit } = handlers;
   const {
     title,
@@ -114,7 +113,7 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
                 fullWidth
                 value={description}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setDescription(event.target.value);
+                  setDescription && setDescription(event.target.value);
                 }}
                 InputProps={{
                   sx: {
@@ -150,7 +149,7 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
                 type="number"
                 value={position}
                 onChange={(e) => {
-                  setPosition(parseInt(e.target.value));
+                  setPosition && setPosition(parseInt(e.target.value));
                 }}
                 inputProps={{ min: 1, max: 5 }}
                 fullWidth
@@ -203,4 +202,4 @@ function DialogComp({ handlers, stateProps, dialogTitle, type }: Props) {
   );
 }
 
-export default DialogComp;
+export default DialogForm;
