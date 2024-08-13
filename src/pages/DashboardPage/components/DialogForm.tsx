@@ -17,7 +17,7 @@ export interface stateProps {
   title: string | null;
   description?: string | null;
   setDescription?: React.Dispatch<React.SetStateAction<string | null>>;
-  position?: number;
+  position?: any;
   setPosition?: React.Dispatch<React.SetStateAction<number | null>>;
   open: boolean;
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
