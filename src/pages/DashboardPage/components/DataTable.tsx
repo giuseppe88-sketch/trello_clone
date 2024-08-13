@@ -176,9 +176,9 @@ function DataTable({
         const newColumns = [...sortedData];
         // Find the active column containing the active card
         // let activeColumn: (typeof newColumns)[0] | undefined;
-        let overColumn: (typeof newColumns)[0] | undefined;
+        let overColumn: any;
         let cardToMove: any;
-        let cardToMoveIndex: number;
+        // let cardToMoveIndex: number;
         newColumns.forEach((column) => {
           if (column.cards.some((card) => card._id === active.id)) {
             column.cards.map((card) => {
@@ -192,11 +192,15 @@ function DataTable({
           }
         });
 
-        const indexActive = active.data.current.sortable.index;
+        const indexActive: number | undefined =
+          active.data.current.sortable.index;
         const overActive = over.data.current.sortable.index;
 
         overColumn?.cards.push(cardToMove);
-        const indexActiveMo: number = overColumn?.cards.indexOf(cardToMove);
+        const indexActiveMo = overColumn?.cards.indexOf(cardToMove);
+        if (indexActiveMo === -1) {
+          throw new Error("Card to move not found in overColumn");
+        }
 
         if (overColumn) {
           if (indexActive !== -1 && overActive !== -1) {

@@ -48,6 +48,7 @@ export default function LoginPage() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
+    console.log(event)
     if (reason === "clickaway") {
       return;
     }

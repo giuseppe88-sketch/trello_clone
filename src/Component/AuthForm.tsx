@@ -23,7 +23,7 @@ export interface AuthFormProps {
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
   email?: string;
-  setEmail?: React.Dispatch<React.SetStateAction<string>>;
+  setEmail?: any;
   openAlert: boolean;
   alert: string | null;
   setOpenSuccessAlert?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -121,7 +121,7 @@ function AuthForm({
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                value={email}
+                value={email || ""}
                 onChange={(e) => setEmail(e.target.value)}
               />
             )}

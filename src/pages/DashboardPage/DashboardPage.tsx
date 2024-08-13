@@ -146,7 +146,7 @@ export default function DashboardPage() {
           setListId(null);
         })
         .then(() => {
-          getCards(userToken).then(() => console.log("Cardssssss"));
+          getCards(userToken).then(() => console.log(""));
           setOpenDelete(false);
         })
 
@@ -162,6 +162,7 @@ export default function DashboardPage() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
+    console.log(event)
     if (reason === "clickaway") {
       return;
     }
@@ -244,7 +245,6 @@ export default function DashboardPage() {
             newCardContent={""}
             onSearchChange={function (
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              e: React.ChangeEvent<HTMLInputElement>
             ): void {
               throw new Error("Function not implemented.");
             }}
