@@ -86,6 +86,10 @@ export default function ColumnList({
     () => list.cards.map((cardId: any) => cardId._id),
     [list]
   );
+  // const cardIds1 = React.useMemo(
+  //   () => dataCards.map((dataCard:any)=> dataCard._id), TODO: IMPLMENTATION ALL CARDIDS FOR DRAG AND DROP PORTAL
+  //   [dataCards]
+  // );
 
   const handlerProps = {
     handleSubmit: handlers.handleSubmit,
@@ -254,7 +258,6 @@ export default function ColumnList({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "7px",
-                padding: "10px",
               }}
             >
               <AddIcon />

@@ -99,7 +99,7 @@ function DataTable({
       setActiveColumn(null);
       setActiveCard(null);
       const { over, active } = event;
-
+      console.log(event);
       if (!over) return;
 
       let activeCardIndex: number | null = null;
@@ -130,6 +130,7 @@ function DataTable({
       const isOverATask = over.data.current.type === "Card";
 
       if (activeColumnIndex !== -1 || overColumnIndex !== -1) {
+        // sort column
         setDataList((dataList: any[]) => {
           const activeColumn = dataList.findIndex(
             (dataList) => dataList._id === activeColumnId
@@ -142,6 +143,7 @@ function DataTable({
           return arrayMove(sortedData, overColumn, activeColumn);
         });
       } else if (activeCardIndex !== -1 && overCardIndex !== -1) {
+        //sort Card Task same column
         const newColumns = [...sortedData];
         // Find the active column containing the active card
         let activeColumn: (typeof newColumns)[0] | undefined;
@@ -169,6 +171,44 @@ function DataTable({
         }
         setDataList(newColumns);
       } else if (isActiveATask && isOverATask) {
+        // sort card in a different column
+
+        const newColumns = [...sortedData];
+        // Find the active column containing the active card
+        // let activeColumn: (typeof newColumns)[0] | undefined;
+        let overColumn: (typeof newColumns)[0] | undefined;
+        let cardToMove: any;
+        let cardToMoveIndex: number;
+        newColumns.forEach((column) => {
+          if (column.cards.some((card) => card._id === active.id)) {
+            column.cards.map((card) => {
+              if (card._id === active.id) {
+                cardToMove = card;
+              }
+            });
+          }
+          if (column.cards.some((card) => card._id === over.id)) {
+            overColumn = column;
+          }
+        });
+
+        const indexActive = active.data.current.sortable.index;
+        const overActive = over.data.current.sortable.index;
+
+        overColumn?.cards.push(cardToMove);
+        const indexActiveMo: number = overColumn?.cards.indexOf(cardToMove);
+
+        if (overColumn) {
+          if (indexActive !== -1 && overActive !== -1) {
+            overColumn.cards = arrayMove(
+              overColumn.cards,
+              indexActiveMo,
+              overActive
+            );
+          }
+        }
+        setDataList(newColumns);
+
         const activeTaskId = active.id;
         const overTaskColumnId = over.data.current.card["listId"];
 
@@ -276,6 +316,10 @@ function DataTable({
                 maxHeight: "50px",
                 minWidth: "270px",
                 borderRadius: "13px",
+                "&:hover": {
+                  backgroundColor: "#ffdeff3a",
+                  color: "white",
+                },
               }}
             >
               <Button onClick={() => setOpen(true)}>

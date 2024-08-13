@@ -10,8 +10,9 @@ import MainAppbar from "./components/MainAppbar";
 import Navbar from "./components/Navbar";
 
 import DataTable from "./components/DataTable";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
+import { useNavigate } from "react-router-dom";
 // const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
 
 export interface CardProps {
@@ -37,6 +38,7 @@ export default function DashboardPage() {
     cardId,
     deleteCard,
     putCard,
+    isAuthenticated
   } = useContext(AuthContext);
 
   const [title, setTitle] = useState<string>("");
@@ -51,8 +53,17 @@ export default function DashboardPage() {
   const [isError, setIsError] = useState<boolean | null>(null);
 
   // const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const handleSubmit =
-    (listId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login"); 
+    }
+  }, [isAuthenticated, navigate]);
+
+  function handleSubmit(listId: string | null) {
+    return (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
       postCard(title, description, listId, userToken, position)
@@ -83,9 +94,9 @@ export default function DashboardPage() {
 
         .catch((error): any => {
           console.error("Error adding card:", error);
-          // Handle error appropriately
         });
     };
+  }
   const handleSubmitModify =
     (cardId: string | null) => (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -196,7 +207,6 @@ export default function DashboardPage() {
   };
 
   const sortedData = React.useMemo(() => {
-    console.log(dataList);
     return dataList.map((list: any) => {
       // Create a mapping from cardId to index in the original list.cards array
       const cardOrderMap = list.cards.reduce(
@@ -218,7 +228,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      {userToken ? (
+      {isAuthenticated ? (
         <div
           className="dashboard-container"
           style={{
@@ -256,7 +266,20 @@ export default function DashboardPage() {
           </Box>
         </div>
       ) : (
-        "USER NOT AUTHENTICATED"
+        <div
+          style={{
+            width: "100%",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            margin: "0 auto",
+          }}
+        >
+          <Typography sx={{ color: "white", fontSize: "32px" }}>
+            {` Session expired!! redirect to the login page`}
+          </Typography>
+        </div>
       )}
     </>
   );

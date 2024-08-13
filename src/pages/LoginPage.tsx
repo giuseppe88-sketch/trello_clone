@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../Context/AuthContext";
 import AuthForm from "../Component/AuthForm";
+import { startTransition } from "react";
 
 export default function LoginPage() {
   const { loginRequest } = useContext(AuthContext);
@@ -19,26 +20,28 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    await loginRequest(username, password)
-      .then((result: any) => {
-        if (!result.user) {
-          console.error(result.message);
-          setError(true); // Open the Snackbar on error
-          setAlert(result.message);
-          setOpenAlert(true); // Open the Snackbar on error
-          return;
-        } else {
-          setAlert("Successfully logged in");
-          setError(false); // Close the Snackbar on success
-          setOpenAlert(true); // Open the Snackbar on success
-          setInterval(() => {
-            navigate("/");
-          }, 1000);
-          setUsername("");
-          setPassword("");
-        }
-      })
-      .catch((error: any) => console.log("error", error));
+    startTransition(() => {
+      loginRequest(username, password)
+        .then((result: any) => {
+          if (!result.user) {
+            console.error(result.message);
+            setError(true); // Open the Snackbar on error
+            setAlert(result.message);
+            setOpenAlert(true); // Open the Snackbar on error
+            return;
+          } else {
+            setAlert("Successfully logged in");
+            setError(false); // Close the Snackbar on success
+            setOpenAlert(true); // Open the Snackbar on success
+            setInterval(() => {
+              navigate("/board");
+            }, 1000);
+            setUsername("");
+            setPassword("");
+          }
+        })
+        .catch((error: any) => console.log("error", error));
+    });
   };
 
   const handleClose = (
@@ -61,7 +64,7 @@ export default function LoginPage() {
     alert,
     handleSubmit,
     handleClose,
-    isError
+    isError,
   };
 
   return (

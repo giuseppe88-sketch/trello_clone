@@ -28,6 +28,8 @@ export interface List {
 
 interface AuthState {
   isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+
   loginRequest: (username: string, password: string) => Promise<void>;
 
   registerRequest: (
@@ -37,6 +39,7 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   userToken: string | null;
+  setUserToken: React.Dispatch<React.SetStateAction<string | null>>;
   dataCards: {
     _id: string;
     title: string;
@@ -82,6 +85,7 @@ interface AuthState {
 
 const initialAuthState: AuthState = {
   isAuthenticated: false,
+  setIsAuthenticated: async () => {},
   loginRequest: async () => {},
   registerRequest: async () => {},
   deleteCard: async () => {},
@@ -89,6 +93,7 @@ const initialAuthState: AuthState = {
   getCards: async () => {},
   logout: () => {},
   userToken: null,
+  setUserToken: async () => {},
   dataCards: [],
   setListId: async () => {},
   setCardId: async () => {},
@@ -126,6 +131,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [dataCards, setDataCards] = useState<[]>([]);
   const [listId, setListId] = useState<string | null>(null); // New state for listId
   const [cardId, setCardId] = useState<string | null>(""); // New state for listId
+
+  useEffect(() => {
+    // Update userToken if it changes in localStorage
+    const token = localStorage.getItem("token");
+    setUserToken(token);
+  }, []);
+
   const loginRequest = async (username: string, password: string) => {
     return login(username, password)
       .then((response) => {
@@ -328,6 +340,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        setIsAuthenticated,
         loginRequest,
         logout,
         userToken,
@@ -347,6 +360,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         moveCard,
         postList,
         deleteList,
+        setUserToken,
       }}
     >
       {children}

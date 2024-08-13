@@ -15,6 +15,5 @@ body {
   height: 100vh; /* Set the height as needed */
   position: relative;
   scrollbar-width: thin; /* Makes the scrollbar thinner */
-  scrollbar-color: #555 #101204; /* 
-
+  scrollbar-color: #555 #101204;
 }
