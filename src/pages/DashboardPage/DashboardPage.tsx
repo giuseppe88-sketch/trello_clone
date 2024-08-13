@@ -277,7 +277,7 @@ export default function DashboardPage() {
           }}
         >
           <Typography sx={{ color: "white", fontSize: "32px" }}>
-            {` Session expired!! redirect to the login page`}
+            {` Session expired or not authenticated!! redirect to the login page`}
           </Typography>
         </div>
       )}
