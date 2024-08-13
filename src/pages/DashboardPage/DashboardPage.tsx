@@ -13,7 +13,6 @@ import DataTable from "./components/DataTable";
 import { Box, Typography } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
-// const listOrder = ["To Do", "In Progress", "In Testing", "Closed"];
 
 export interface CardProps {
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -29,7 +28,6 @@ export default function DashboardPage() {
     userToken,
     getCards,
     dataList,
-    // setDataList,
     dataCards,
     postCard,
     setListId,
@@ -38,7 +36,6 @@ export default function DashboardPage() {
     cardId,
     deleteCard,
     putCard,
-    isAuthenticated
   } = useContext(AuthContext);
 
   const [title, setTitle] = useState<string>("");
@@ -57,10 +54,11 @@ export default function DashboardPage() {
 
 
   React.useEffect(() => {
-    if (!isAuthenticated) {
+    if (!userToken) {
       navigate("/login"); 
     }
-  }, [isAuthenticated, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userToken]);
 
   function handleSubmit(listId: string | null) {
     return (event: React.FormEvent<HTMLFormElement>) => {
@@ -229,7 +227,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      {isAuthenticated ? (
+      {userToken ? (
         <div
           className="dashboard-container"
           style={{

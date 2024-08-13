@@ -129,7 +129,7 @@ function DataTable({
       const isActiveATask = active.data.current.type === "Card";
       const isOverATask = over.data.current.type === "Card";
 
-      if (activeColumnIndex !== -1 || overColumnIndex !== -1) {
+      if (activeColumnIndex !== -1 || overColumnIndex !== -1) {//TODO: implement backend logic
         // sort column
         setDataList((dataList: any[]) => {
           const activeColumn = dataList.findIndex(
@@ -142,7 +142,7 @@ function DataTable({
 
           return arrayMove(sortedData, overColumn, activeColumn);
         });
-      } else if (activeCardIndex !== -1 && overCardIndex !== -1) {
+      } else if (activeCardIndex !== -1 && overCardIndex !== -1) {//TODO: implement backend logic
         //sort Card Task same column
         const newColumns = [...sortedData];
         // Find the active column containing the active card

@@ -17,7 +17,7 @@ export interface stateProps {
   title: string | null;
   description?: string | null;
   setDescription?: React.Dispatch<React.SetStateAction<string | null>>;
-  position?: number| null;
+  position?: number;
   setPosition?: React.Dispatch<React.SetStateAction<number | null>>;
   open: boolean;
   setCardTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -77,6 +77,7 @@ function DialogForm({ handlers, stateProps, dialogTitle }: Props) {
               type="text"
               fullWidth
               value={title}
+              helperText={title === "" ? "This field cannot be empty" : ""}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setCardTitle(event.target.value);
               }}
@@ -149,6 +150,14 @@ function DialogForm({ handlers, stateProps, dialogTitle }: Props) {
                 type="number"
                 value={position}
                 onChange={(e) => {
+                  if (e.target.value === "" || Number(e.target.value) > 5) {
+                    // Fixed: Convert e.target.value to number
+                    alert(
+                      "Please enter a valid number or a number between 1 and 5"
+                    );
+                    return;
+                  }
+
                   setPosition && setPosition(parseInt(e.target.value));
                 }}
                 inputProps={{ min: 1, max: 5 }}
