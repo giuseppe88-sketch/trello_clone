@@ -45,7 +45,7 @@ const MainAppbar: React.FC<MainAppbarProps> = ({
         localStorage.removeItem("token");
         setUserToken(null);
         setIsAuthenticated(false)        
-        navigate("/login");
+        navigate("/");
         window.location.reload()
       } catch (error) {
         console.error("Error during logout", error);
