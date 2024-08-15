@@ -65,7 +65,6 @@ export default function DashboardPage() {
 
       postCard(title, description, listId, userToken, position)
         .then((result: any) => {
-          console.log("result", result);
           if (!result || result === undefined) {
             setOpen(false);
             setAlert("error occurred while submitting");
@@ -100,7 +99,6 @@ export default function DashboardPage() {
 
       putCard(cardId, userToken, title, description, position)
         .then((result: any) => {
-          console.log("result", result);
           if (!result || result === undefined) {
             setOpenModify(false);
             setAlert("error occurred while submitting");
@@ -143,7 +141,7 @@ export default function DashboardPage() {
           setListId(null);
         })
         .then(() => {
-          getCards(userToken).then(() => console.log(""));
+          getCards(userToken);
           setOpenDelete(false);
         })
 
@@ -159,7 +157,6 @@ export default function DashboardPage() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
-    console.log(event);
     if (reason === "clickaway") {
       return;
     }
