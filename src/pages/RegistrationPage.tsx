@@ -56,6 +56,8 @@ export default function LoginPage() {
     reason?: string
   ) => {
     if (reason === "clickaway") {
+      console.log(event);
+
       return;
     }
     setOpenAlert(false); // Close the Snackbar

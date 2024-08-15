@@ -158,6 +158,7 @@ export default function DashboardPage() {
     reason?: string
   ) => {
     if (reason === "clickaway") {
+      console.log(event)
       return;
     }
     setOpenAlert(false);
