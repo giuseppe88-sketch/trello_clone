@@ -63,8 +63,9 @@ function AuthForm({
             padding: 1,
             borderRadius: "10px",
             boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.8)",
-            height: type === "login" ? "680px" : "780px",
-            backgroundColor: type === "register" ? "rgba(211, 211, 226, 0.842)		" : "#EFEFEF",
+            height: type === "login" ? "740px" : "780px",
+            backgroundColor:
+              type === "register" ? "rgba(211, 211, 226, 0.842)		" : "#EFEFEF",
           }}
         >
           <>
@@ -74,6 +75,19 @@ function AuthForm({
             <Typography component="h1" variant="h5">
               {type === "login" ? t("signIn") : t("signUp")}
             </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              marginTop:"10px"}}
+            >
+              <Typography fontSize={"14px"}>
+                {type === "login" && "Test User : jhonny"}
+              </Typography>
+              <Typography fontSize={"14px"}>
+                {type === "login" && "Test Password : Test"}
+              </Typography>
+            </Box>
           </>
           <Box
             component="form"

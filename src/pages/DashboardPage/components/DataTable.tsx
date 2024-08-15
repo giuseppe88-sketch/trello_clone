@@ -162,7 +162,6 @@ function DataTable({
           const newIndex = activeColumn.cards.findIndex(
             (objCard: any) => objCard._id === over.id
           );
-          console.log("oldIndex", oldIndex, "new index", newIndex);
           if (oldIndex !== -1 && newIndex !== -1) {
             activeColumn.cards = arrayMove(
               activeColumn.cards,
@@ -171,7 +170,6 @@ function DataTable({
             );
           }
         }
-        console.log(activeColumn?.cards, newColumns);
         setDataList(newColumns);
         
       } else if (isActiveATask && isOverATask) {

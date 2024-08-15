@@ -231,7 +231,7 @@ function Cards({
             </Box>
           </Paper>
         </Box>
-        <Dialog open={modalProps.openDelete} onClose={handleCloseDelete} sx={{backgroundColor:"rgba(255,255,255,0.5)", opacity:"0.5"}}>
+        <Dialog open={modalProps.openDelete} onClose={handleCloseDelete}>
           <DialogTitle>
             {"Are you sure you want to delete this card from your list?"}
           </DialogTitle>
