@@ -145,7 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error(response.message);
           return response;
         } else {
-          console.log("response token: " + response.token, response);
           localStorage.setItem("token", response.token);
           setUserToken(response.token);
           setIsAuthenticated(true);
@@ -167,7 +166,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!response.user) {
           return response;
         } else {
-          console.log("response token: " + response.token, response);
           localStorage.setItem("token", response.token);
           setUserToken(response.token);
           setIsAuthenticated(true);

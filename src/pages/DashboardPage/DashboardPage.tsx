@@ -52,12 +52,11 @@ export default function DashboardPage() {
   // const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-
   React.useEffect(() => {
     if (!userToken) {
-      navigate("/login"); 
+      navigate("/login");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userToken]);
 
   function handleSubmit(listId: string | null) {
@@ -160,7 +159,7 @@ export default function DashboardPage() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
-    console.log(event)
+    console.log(event);
     if (reason === "clickaway") {
       return;
     }
@@ -207,10 +206,11 @@ export default function DashboardPage() {
 
   const sortedData = React.useMemo(() => {
     return dataList.map((list: any) => {
+  
       // Create a mapping from cardId to index in the original list.cards array
       const cardOrderMap = list.cards.reduce(
         (acc: any, card: any, index: number) => {
-          acc[card["title"]] = index;
+          acc[card["description"]] = index;
           return acc;
         },
         {}
@@ -219,11 +219,13 @@ export default function DashboardPage() {
       const cards = dataCards
         ?.filter((card: any) => card.listId === list._id)
         .sort((a: any, b: any) => {
-          return cardOrderMap[a.title] - cardOrderMap[b.title];
+          return cardOrderMap[a.description] - cardOrderMap[b.description];
         });
+
       return { ...list, cards };
     });
   }, [dataList, dataCards]);
+
 
   return (
     <>
@@ -241,9 +243,8 @@ export default function DashboardPage() {
         >
           <MainAppbar
             newCardContent={""}
-            onSearchChange={function (
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            ): void {
+            onSearchChange={function (): // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            void {
               throw new Error("Function not implemented.");
             }}
           />
